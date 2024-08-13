@@ -102,6 +102,8 @@ class Game:
         self.image_library["white_bishop"] = loadImage("images/white_bishop.png")
         self.image_library["white_king"] = loadImage("images/white_king.png")
         self.image_library["white_queen"] = loadImage("images/white_queen.png")
+        self.image_library["valid_move"] = loadImage("images/valid_move.png")
+        self.image_library["valid_take"] = loadImage("images/take.png")
 
     def _add_custom_events(self):
         self.custom_events["object_created"] = pygame.event.custom_type()
