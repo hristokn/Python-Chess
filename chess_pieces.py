@@ -2,6 +2,7 @@ import pygame.surface
 from chess_board import ChessBoardObject
 from move import Move
 from tuple_n import TupleN
+from my_enums import Color
 
 
 class ChessBoard:
@@ -9,12 +10,9 @@ class ChessBoard:
 
 
 class Piece(ChessBoardObject):
-    def __init__(self, is_white: bool, **kwargs):
+    def __init__(self, color: Color, **kwargs):
         super().__init__(**kwargs)
-        self.white = is_white
-
-    def is_white(self) -> bool:
-        return self.white
+        self.color = color
 
     def is_empty(self):
         return False
@@ -172,31 +170,45 @@ class Pawn(Piece):
             image=image,
         )
 
-    def get_moves(self) -> list[Move]:
+    def get_moves(
+        self, square: TupleN[int, int], chess_board: list[ChessBoardObject]
+    ) -> list[Move]:
         valid_squares = []
 
-        square = self.board.get_square(self)
+        try:
+            forward_square = (
+                square + TupleN((-1, 0))
+                if self.color == Color.WHITE
+                else square + TupleN((1, 0))
+            )
+            piece = chess_board[forward_square[0]][forward_square[1]]
+            if piece.is_empty():
+                valid_squares.append(Move(square, forward_square))
+        except IndexError:
+            pass
 
-        forward = (
-            square + TupleN((-1, 0)) if self.is_white() else square + TupleN((1, 0))
-        )
-        left_diagonal = (
-            square + TupleN((-1, -1)) if self.is_white() else square + TupleN((1, -1))
-        )
-        right_diagonal = (
-            square + TupleN((-1, 1)) if self.is_white() else square + TupleN((1, -1))
-        )
+        try:
+            left_diagonal_square = (
+                square + TupleN((-1, -1))
+                if self.color == Color.WHITE
+                else square + TupleN((1, -1))
+            )
+            piece = chess_board[left_diagonal_square[0]][left_diagonal_square[1]]
+            if not piece.is_empty() and self.color != piece.color:
+                valid_squares.append(Move(square, left_diagonal_square))
+        except IndexError:
+            pass
 
-        square = self.board.get_piece(forward)
-        if square.is_empty():
-            valid_squares.append(square)
-
-        square = self.board.get_piece(left_diagonal)
-        if not square.is_empty() and square.is_white() != self.is_white():
-            valid_squares.append(square)
-
-        square = self.board.get_piece(right_diagonal)
-        if not square.is_empty() and square.is_white() != self.is_white():
-            valid_squares.append(square)
+        try:
+            right_diagonal_square = (
+                square + TupleN((-1, 1))
+                if self.color == Color.WHITE
+                else square + TupleN((1, -1))
+            )
+            piece = chess_board[right_diagonal_square[0]][right_diagonal_square[1]]
+            if not piece.is_empty() and self.color != piece.color:
+                valid_squares.append(Move(square, right_diagonal_square))
+        except IndexError:
+            pass
 
         return valid_squares
