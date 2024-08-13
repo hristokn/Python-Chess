@@ -2,6 +2,8 @@ import pygame.surface
 from game_objects import Collider, GameObject, Drawable, ChessBoardObject
 from chess_pieces import Pawn, Rook, Knight, Bishop, King, Queen
 from tuple_n import TupleN
+from move import Move
+from my_enums import Color
 
 
 class ChessBoard(Collider, GameObject, Drawable):
@@ -24,6 +26,10 @@ class ChessBoard(Collider, GameObject, Drawable):
         self.objects = []
         self._fill_board()
         self.selected = None
+        self.past_moves = []
+        self.possible_moves = []
+        self.color_to_move = Color.WHITE
+        self.taken_pieces = []
 
     def _fill_board(self):
 
@@ -142,14 +148,22 @@ class ChessBoard(Collider, GameObject, Drawable):
             return
 
         self.selected = piece
-        valid_moves = piece.get_moves()
+        self.highlight_potential_moves()
+
+    def highlight_potential_moves(self, piece: ChessBoardObject | None = None):
+        if piece == None:
+            piece = self.selected
+        if piece.is_empty():
+            raise Exception("Empty square passed as argument")
+
+        square = self.get_square(piece)
+        valid_moves = filter(lambda move: move.start == square, self.possible_moves)
         for move in valid_moves:
-            move_square = self.chess_board[move[0]][move[1]]
-            if move_square.is_empty():
+            piece = self.get_piece(move.end)
+            if piece.is_empty():
                 self.add_valid_move_object(move)
             else:
                 self.add_valid_take_object(move)
-                pass
 
     def add_valid_move_object(self, square: tuple[int, int]):
         screen_position = self._convert_square_to_screen_position(square)
@@ -187,6 +201,52 @@ class ChessBoard(Collider, GameObject, Drawable):
         row = relative_pos[0] / square_size
         column = relative_pos[1] / square_size
         return (row, column)
+
+    def next_player(self):
+        self.color_to_move = (
+            Color.BLACK if self.color_to_move == Color.WHITE else Color.WHITE
+        )
+
+    def calculate_potential_moves(self, color: Color | None = None):
+        self.moves = []
+        if color == None:
+            color = self.color
+
+        for row in ChessBoard:
+            for piece in row:
+                if not piece.is_empty() and piece.color == color:
+                    self.possible_moves += piece.get_moves(
+                        self.get_square(piece), self.chess_board
+                    )
+
+    def play_move(self, move: Move):
+        if not move in self.possible_moves:
+            raise Exception("Tried to play invalid move")
+
+        if self.get_piece(move.end).is_empty():
+            self.move(move)
+        else:
+            self.take(move)
+
+        self.past_moves.append(move)
+        self.next_player()
+        self.calculate_potential_moves()
+
+    def move(self, move: Move):
+        start_piece = self.get_piece(move.start)
+        end_square = self.get_piece(move.end)
+        self.chess_board[move.end[0]][move.end[1]] = start_piece
+        self.chess_board[move.start[0]][move.start[1]] = end_square
+
+    def take(self, move: Move):
+        start_piece = self.get_piece(move.start)
+        end_piece = self.get_piece(move.end)
+
+        self.chess_board[move.end[0]][move.end[1]] = start_piece
+        self.add_empty_square(move.start)
+        self._add_object(self.chess_board[move.start[0]][move.start[1]])
+        self._remove_object(end_piece)
+        self.taken_pieces.append(end_piece)
 
 
 class EmptySquare(ChessBoardObject):
