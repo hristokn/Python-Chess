@@ -22,9 +22,9 @@ def line_attack(square: Square, board: dict[Square: Piece], direction: Callable[
     while sq != Square.UNKNOWN and (board[sq] == None or board[sq].color != piece.color):
         changes = {square: None, sq: piece}
         if board[sq] == None:
-            moves.append(Move(changes,[]))
+            moves.append(Move(changes,[], piece))
         else:
-            moves.append(Move(changes,[board[sq]]))
+            moves.append(Move(changes,[board[sq]], piece))
         sq = direction(sq)
     return moves
 
@@ -35,7 +35,7 @@ def one_step_only_take(square: Square, board: dict[Square: Piece], direction: Ca
     sq = direction(square)
     if sq != Square.UNKNOWN and board[sq].color != piece.color:
         changes = {square: None, sq: piece}
-        moves.append(Move(changes,[board[sq]]))
+        moves.append(Move(changes,[board[sq]], piece))
     return moves
 
 def one_step_only_move(square: Square, board: dict[Square: Piece], direction: Callable[[Square],Square]):
@@ -44,7 +44,7 @@ def one_step_only_move(square: Square, board: dict[Square: Piece], direction: Ca
     sq = direction(square)
     if sq != Square.UNKNOWN and board[sq] == None:
         changes = {square: None, sq: piece}
-        moves.append(Move(changes,[]))
+        moves.append(Move(changes,[]), piece)
     return moves
 
 def one_step_attack(square: Square, board: dict[Square: Piece], direction: Callable[[Square],Square]):

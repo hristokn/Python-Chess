@@ -3,9 +3,10 @@ class Piece:
     pass
 
 class Move:
-    def __init__(self, changes: dict[Square: Piece], taken: list[Piece]):
+    def __init__(self, changes: dict[Square: Piece], taken: list[Piece], piece: Piece):
         self.changes = changes
         self.taken = taken
+        self.piece = piece
     
     def __str__(self) -> str:
         if len(self.changes) != 2 or len(self.taken) > 1:
