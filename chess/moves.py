@@ -8,6 +8,19 @@ class Move:
         self.taken = taken
         self.piece = piece
     
+    def __eq__(self, other):
+        if isinstance(other, Move):
+            return (self.changes == other.changes
+                    and self.taken == other.taken
+                    and self.piece == other.piece)
+        return NotImplemented
+
+    def __ne__(self, other):
+        x = self.__eq__(other)
+        if x is not NotImplemented:
+            return not x
+        return NotImplemented
+    
     def __str__(self) -> str:
         if len(self.changes) != 2 or len(self.taken) > 1:
             raise NotImplementedError
