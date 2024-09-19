@@ -1,36 +1,7 @@
-from enum import Enum
 from typing import Callable
 from chess.squares import Square, Orientation, WhiteOrientation, BlackOrientation
 from chess.move_logic import Move, pawn_move_logic, knight_move_logic, bishop_move_logic, rook_move_logic, king_move_logic, queen_move_logic
-
-class PieceType(Enum):
-    PAWN = 0
-    KNIGHT = 1
-    BISHOP = 2
-    ROOK = 3
-    KING = 4
-    QUEEN = 5
-
-    def __str__(self) -> str:
-        match self:
-            case PieceType.PAWN:
-                return ''
-            case PieceType.KNIGHT:
-                return 'N'
-            case PieceType.BISHOP:
-                return 'B'
-            case PieceType.ROOK:
-                return 'R'
-            case PieceType.KING:
-                return 'K'
-            case PieceType.QUEEN:
-                return 'Q'
-            case _:
-                raise NotImplementedError
-
-class Color(Enum):
-    WHITE = 0
-    BLACK = 1
+from chess.enums import Color, PieceType
 
 class Piece:
     def __init__(self, color: Color, piece_type: PieceType):

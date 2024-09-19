@@ -1,5 +1,6 @@
-from chess.pieces import Piece, Color, PieceType, Move
-from chess.squares import Square, WhiteOrientation, BlackOrientation
+from chess.pieces import Piece, Move
+from chess.enums import Color, PieceType
+from chess.squares import Square, WhiteOrientation
 from chess.moves import Move
 class ChessBoard:
     def __init__(self):
