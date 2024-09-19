@@ -54,7 +54,7 @@ class Mouse:
 
     def register_button_observer(self, clickable: Clickable):
         self.button_observer.append(clickable)
-        self.button_observer.sort(lambda c: c.priority, reverse=True)
+        self.button_observer.sort(key=lambda c: c.priority, reverse=True)
 
     def unregister_button_observer(self,clickable: Clickable):
         self.button_observer.remove(clickable)
