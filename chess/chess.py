@@ -2,6 +2,7 @@ from chess.pieces import Piece, Move
 from chess.enums import Color, PieceType
 from chess.squares import Square, WhiteOrientation
 from chess.moves import Move
+
 class ChessBoard:
     def __init__(self):
         self.board = {}
@@ -18,15 +19,16 @@ class ChessBoard:
                 self.possible_moves.extend(piece.get_moves(sq, self.past_moves, self.board))
             
     def start(self):
-        self.turn()
+        self.prepare_turn()
 
     def play_move(self, move: Move):
         if not move in self.possible_moves:
-            raise ValueError
+            return False
         
         self.taken_pieces.extend(move.taken)
         for sq, piece in move.changes.items():
             self.board[sq] = piece
+        return True
 
     def print_possible_moves(self):
         i = 1
@@ -34,17 +36,13 @@ class ChessBoard:
             print(str(i) + ' ' + str(move))
             i = i + 1
 
-    def turn(self):
+    def prepare_turn(self):
         self.calc_possible_moves(self.color_to_play)
-        self.print_possible_moves()
-        inp = int(input('pick move'))
 
-        if(inp > len(self.possible_moves)):
-            raise ValueError
-        
-        self.play_move(self.possible_moves[inp - 1])
+    def turn(self, move: Move):
+        self.play_move(move)
         self.next_color()
-        self.turn()
+        self.prepare_turn()
         
     def next_color(self):
         if self.color_to_play == Color.WHITE:
