@@ -33,7 +33,7 @@ def one_step_only_take(square: Square, board: dict[Square: Piece], direction: Ca
     moves = []
     piece = board[square]
     sq = direction(square)
-    if sq != Square.UNKNOWN and board[sq].color != piece.color:
+    if sq != Square.UNKNOWN and board[sq] != None and board[sq].color != piece.color:
         changes = {square: None, sq: piece}
         moves.append(Move(changes,[board[sq]], piece))
     return moves
@@ -44,7 +44,7 @@ def one_step_only_move(square: Square, board: dict[Square: Piece], direction: Ca
     sq = direction(square)
     if sq != Square.UNKNOWN and board[sq] == None:
         changes = {square: None, sq: piece}
-        moves.append(Move(changes,[]), piece)
+        moves.append(Move(changes,[], piece))
     return moves
 
 def one_step_attack(square: Square, board: dict[Square: Piece], direction: Callable[[Square],Square]):
@@ -73,7 +73,8 @@ def pawn_move_logic(square: Square, board: dict[Square: Piece], prev_moves: list
 
     moves.extend(one_step_only_move(square, board, orientaion.up))
     if len(moves) != 0 and not has_moved_before(pawn, prev_moves):
-        moves.extend(one_step_only_move(square, board, orientaion.up(orientaion.up)))
+        two_up = lambda sq: orientaion.up(orientaion.up(sq))
+        moves.extend(one_step_only_move(square, board, two_up))
         if len(moves) == 2:
             moves[1].long_pawn_move = True
 
