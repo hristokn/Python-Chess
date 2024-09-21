@@ -3,7 +3,7 @@ from chess_controller import *
 from mouse import Mouse
 from chess.chess import ChessBoard
 from chess.enums import Color
-from drawing import get_square_pos, get_square_color, SQUARE_SIZE, ImageLibrary, IMAGES, get_piece_image_name
+from drawing import ImageLibrary, IMAGES
 
 class Game:
     def __init__(self, width: int, height: int, framerate: int = 30):
@@ -78,22 +78,15 @@ class ChessGame(Game):
         self.board_y = 100
         self.color = Color.WHITE
         self.image_library = ImageLibrary(self._get_images())
+        self.selected_piece = None
+        self.held_piece = None
 
     def run(self):
-        self.chess = ChessBoard()
-        for square, piece in self.chess.board.items():
-            sq_img = self.image_library.get('white_square')
-            if get_square_color(square):
-                sq_img = self.image_library.get('black_square')
-            pos = get_square_pos(self.board_x, self.board_y, square, self.color)
-            sc = SquareController(square, self, pos[0], pos[1], pos[0] + SQUARE_SIZE, pos[1] + SQUARE_SIZE, 1, sq_img)
-            self.add_object(sc)
-            self.mouse.register_button_observer(sc)
-            if piece != None:
-                pc = PieceController(piece, self, pos[0], pos[1], pos[0] + SQUARE_SIZE, pos[1] + SQUARE_SIZE, 2 , self.image_library.get(get_piece_image_name(piece.color, piece.type)))
-                self.add_object(pc)
-                self.mouse.register_button_observer(pc)
-        self.chess.start()
+        game = ChessBoard(self.color)
+        game.start()
+        self.board_controller = BoardController(game, self.color, self.board_x, self.board_y)
+        self.board_controller.setup(self.image_library, self.mouse)
+        self.add_object(self.board_controller)
         super().run()
 
     def update(self):
@@ -107,8 +100,40 @@ class ChessGame(Game):
                 self.handle_click(event)
 
         pygame.event.pump()
-        # for obj in self.objects:
-        #      obj.update()
+        for obj in self.objects:
+            obj.update()
 
     def _get_images(self):
         return IMAGES
+
+
+
+'''
+def a piece is held if it follows the mouse
+
+if a piece is pressed, we could do a few things
+    if we have no selected piece, select it, tell it that it is held
+    if the pressed piece is the selected piece, do nothing?
+    if we have a selected piece, create the move and try it, also unselect the selected piece
+
+if a piece is uppressed, we could do a few things
+    if we have no selected piece, do nothing
+    if we have a selected piece, and its the same one, let it go
+    if we have a selected and held piece, and its a different piece, make move
+
+if a square is pressed, we could do a few things
+    if we have a selected piece, make move
+    if we have no selected piece, nothing
+
+if a square is uppressed, we do:
+    if we have no selected piece, nothing
+    if we have a seleced piece, but it's NOT held, unselect it
+    if we have a seleced piece, but it's held, try the move, unheld it, do not unselect it,  
+
+we have introduced one piece of state in the game, selected piece ()
+we have introduced one piece of state in the game, held piece    
+
+'''
+
+
+        

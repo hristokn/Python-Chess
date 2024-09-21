@@ -12,15 +12,25 @@ class Clickable(ABC):
         self.x2 = x2
         self.y2 = y2
         self.priority = priority
-        self.left_buttop_pressed = False
-        self.right_buttop_pressed = False
+        self.left_buttop_down = False
+        self.left_buttop_up = False
+        self.right_buttop_down = False
+        self.right_buttop_up = False
 
     def collides(self, x, y):
         return not (x <= self.x1 or x >= self.x2 or y <= self.y1 or y >= self.y2)
 
     @abstractmethod
     def recieve_click(self, event: Event) -> bool:
-        pass
+        if event.type == MOUSEBUTTONUP and event.button == LEFTMOUSEBUTTON:
+            self.left_buttop_up = True
+        elif event.type == MOUSEBUTTONUP and event.button == RIGHTMOUSEBUTTON:
+            self.right_buttop_up = True
+        elif event.type == MOUSEBUTTONDOWN and event.button == LEFTMOUSEBUTTON:
+            self.left_buttop_down = True
+        elif event.type == MOUSEBUTTONDOWN and event.button == RIGHTMOUSEBUTTON:
+            self.right_buttop_down = True
+        return True
 
     @abstractmethod
     def recieve_mouse_motion(self, event: Event):
