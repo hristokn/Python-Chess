@@ -39,6 +39,7 @@ class ChessBoard:
                 break
 
         if move != None:
+            self.past_moves.append(move)
             self.taken_pieces.extend(move.taken)
             for sq, piece in move.changes.items():
                 self.board[sq] = piece

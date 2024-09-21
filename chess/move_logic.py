@@ -1,19 +1,15 @@
 from chess.squares import Square, Orientation
 from chess.moves import Move
+from chess.enums import PieceType
 from typing import Callable
 class Piece:
     pass
 
-# stuff to add, to implement this stuff we need to pass some other context into the functions
+# the king needs to know if he is check. if he is, he can't castle
 #
-# Thes three can be solved if we pass the whole move history of the match
-# We can extend the chess board to be game_context - a tuple of board and move history
-# castling - the whole move history of the king and rook
-# en passant - move history(at least the last move of the opponent)
-# 
 # Maybe don't fix this one here?
-# remove king moves that end in game loss - all possible move of opposing pieces
-
+# remove king moves that would put him in check - all possible move of opposing pieces
+# remove moves that don't get the king out of a check 
 
 def line_attack(square: Square, board: dict[Square: Piece], direction: Callable[[Square],Square]):
     moves = []
@@ -25,6 +21,7 @@ def line_attack(square: Square, board: dict[Square: Piece], direction: Callable[
             moves.append(Move(changes,[], piece))
         else:
             moves.append(Move(changes,[board[sq]], piece))
+            break
         sq = direction(sq)
     return moves
 
@@ -60,13 +57,51 @@ def has_moved_before(piece: Piece, prev_moves: list[Move]):
             
     return False
 
-def last_move_long_pawn_move(prev_moves: list[Move]):
+def last_move_is_long_pawn_move(prev_moves: list[Move]):
     move_count = len(prev_moves) 
     if move_count == 0:
         return False
+    
     move = prev_moves[move_count-1]
-    return hasattr(move, 'long_pawn_move') # TODO: maybe change this
+    piece = move.piece
+    if piece.type != PieceType.PAWN:
+        return False
+    
+    end_square = move.get_end_square()
+    orientation = move.piece.orientation
+    start_square = orientation.down(orientation.down(end_square))
 
+    if move.changes == {start_square: None, move.get_end_square(): move.piece}:
+        return True
+    return False
+
+def castle(square: Square, board: dict[Square: Piece], prev_moves: list[Move], direction: Callable[[Square],Square]):
+    moves = []
+    king = board[square]
+    if has_moved_before(king, prev_moves):
+        return moves
+
+    sq1 = direction(square)
+    sq2 = direction(sq1)
+    sq3 = direction(sq2)
+    sq4 = direction(sq3)
+    rook_square = Square.UNKNOWN
+    move = Move({square: None, sq2: king}, [], king)
+    if sq4 != Square.UNKNOWN and board[sq1] == None and board[sq2] == None and board[sq3] == None:
+        rook_square = sq4
+    elif sq3 != Square.UNKNOWN and board[sq1] == None and board[sq2] == None:
+        rook_square = sq3
+    else:
+        return moves
+
+    rook = board[rook_square]
+    if rook != None and not has_moved_before(rook, prev_moves):
+        move.changes[rook_square] = None
+        move.changes[sq1] = rook
+        moves.append(move)
+
+    return moves
+    
 def pawn_move_logic(square: Square, board: dict[Square: Piece], prev_moves: list[Move], orientaion: Orientation):
     moves = []
     pawn = board[square]
@@ -75,16 +110,20 @@ def pawn_move_logic(square: Square, board: dict[Square: Piece], prev_moves: list
     if len(moves) != 0 and not has_moved_before(pawn, prev_moves):
         two_up = lambda sq: orientaion.up(orientaion.up(sq))
         moves.extend(one_step_only_move(square, board, two_up))
-        if len(moves) == 2:
-            moves[1].long_pawn_move = True
 
     moves.extend(one_step_only_take(square, board, orientaion.upleft))
     moves.extend(one_step_only_take(square, board, orientaion.upright))
 
-    if last_move_long_pawn_move(prev_moves):
+    if last_move_is_long_pawn_move(prev_moves):
         last_move = prev_moves[len(prev_moves)-1]
-        #TODO: implement en passant
+        last_move_end_square = last_move.get_end_square()
+        if orientaion.left(square) == last_move_end_square or orientaion.right(square) == last_move_end_square:
+            end_square = orientaion.up(last_move_end_square)
+            move = Move({square: None, last_move_end_square: None, end_square: pawn},[last_move.piece],pawn)
+            moves.append(move)
     return moves 
+
+
 
 def rook_move_logic(square: Square, board: dict[Square: Piece], prev_moves: list[Move], orientaion: Orientation):
     moves = []
@@ -115,6 +154,10 @@ def king_move_logic(square: Square, board: dict[Square: Piece], prev_moves: list
     moves.extend(one_step_attack(square, board, orientaion.upright))
     moves.extend(one_step_attack(square, board, orientaion.downleft))
     moves.extend(one_step_attack(square, board, orientaion.downright))
+
+    #TODO check if king is in check
+    moves.extend(castle(square, board, prev_moves, orientaion.left))
+    moves.extend(castle(square, board, prev_moves, orientaion.right))
 
     return moves
 
