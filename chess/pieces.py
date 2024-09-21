@@ -7,9 +7,11 @@ class Piece:
     def __init__(self, color: Color, piece_type: PieceType):
         self.color = color
         self.type = piece_type
+        self.orientation = get_orientation(color)
+        self.move_logic = get_logic(self.type)
 
     def get_moves(self, square, prev_moves, chess_board):
-        return get_logic(self.type)(square, chess_board, prev_moves, get_orientation(self.color))
+        return self.move_logic(square, chess_board, prev_moves, self.orientation)
     
     def __str__(self) -> str:
         return str(self.type)
