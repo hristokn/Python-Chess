@@ -13,12 +13,39 @@ class ChessBoard:
         self.color_to_play = color
 
 
+    def checkmate(self):
+        for sq, piece in self.board.items():
+            self.board[sq] = None
+
     def calc_possible_moves(self, color: Color):
         self.possible_moves = []
         for sq, piece in self.board.items():
             if piece != None and piece.color == color:
                 self.possible_moves.extend(piece.get_moves(sq, self.past_moves, self.board))
 
+        self.possible_moves = list(filter(self.is_safe_move, self.possible_moves))
+
+        if len(self.possible_moves) == 0:
+            self.checkmate()
+
+    def is_safe_move(self, move):
+        past_moves = self.past_moves.copy()
+        past_moves.append(move)
+        new_board = self.board.copy()
+        for sq, piece in move.changes.items():
+            new_board[sq] = piece
+
+        color = self.next_color()
+        possible_moves = []
+        for sq, piece in new_board.items():
+            if piece != None and piece.color == color:
+                possible_moves.extend(piece.get_moves(sq, past_moves, new_board))
+
+        for move in possible_moves:
+            is_king = lambda piece: piece.type == PieceType.KING 
+            if len(list(filter(is_king, move.taken))):
+                return False
+        return True
 
     def start(self):
         self.calc_possible_moves(self.color_to_play)
@@ -29,8 +56,7 @@ class ChessBoard:
             if piece == p:
                 return sq
         return Square.UNKNOWN
-
-
+    
     def play_move(self, start: Piece, end: Square):
         move = None
         for m in self.possible_moves:
@@ -49,7 +75,7 @@ class ChessBoard:
 
 
     def prepare_turn(self):
-        self.next_color()
+        self.color_to_play = self.next_color()
         self.calc_possible_moves(self.color_to_play)
 
 
@@ -60,9 +86,9 @@ class ChessBoard:
 
     def next_color(self):
         if self.color_to_play == Color.WHITE:
-            self.color_to_play = Color.BLACK
+            return Color.BLACK
         elif self.color_to_play == Color.BLACK:
-            self.color_to_play = Color.WHITE
+            return Color.WHITE
 
 
     def standard_board(self, board):

@@ -6,10 +6,6 @@ class Piece:
     pass
 
 # the king needs to know if he is check. if he is, he can't castle
-#
-# Maybe don't fix this one here?
-# remove king moves that would put him in check - all possible move of opposing pieces
-# remove moves that don't get the king out of a check 
 
 def line_attack(square: Square, board: dict[Square: Piece], direction: Callable[[Square],Square]):
     moves = []
