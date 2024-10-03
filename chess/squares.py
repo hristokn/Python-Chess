@@ -1,5 +1,6 @@
 from enum import Enum
 from abc import ABC
+from chess.enums import Color
 
 class Square(Enum):
 
@@ -33,6 +34,15 @@ class Square(Enum):
                 result = 'h' + result
 
         return result
+
+
+    def color(self):
+        rank = int(self.value / 8)
+        file = self.value % 8
+        if (rank + file) % 2 == 0:
+            return Color.WHITE
+        return Color.BLACK
+
 
     def up(self):
         return WhiteOrientation.up(self)

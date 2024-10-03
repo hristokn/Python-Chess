@@ -1,29 +1,29 @@
 from mouse import Clickable, LEFTMOUSEBUTTON, RIGHTMOUSEBUTTON, MOUSEBUTTONUP, MOUSEBUTTONDOWN, MOUSEMOTION, Mouse
 from pygame.event import Event
 from pygame import Surface
-from drawing import Drawable, get_square_pos, get_square_color, SQUARE_SIZE, ImageLibrary, get_piece_image_name
-from chess.chess import ChessBoard, Square
+from drawing import Drawable, get_square_pos, SQUARE_SIZE, ImageLibrary, get_piece_image_name
+from chess.chess import ChessBoard, Square, Color
 
 
 class SquareController(Clickable, Drawable):
-    def __init__(self, square, move_image,
-                x1, y1, x2, y2, priority,
-                image):
-        Clickable.__init__(self, x1, y1, x2, y2, priority)
-        Drawable.__init__(self, x1, y1, image)
+    def __init__(self, square, image_library: ImageLibrary,
+                x1, y1, priority):
+        Clickable.__init__(self, x1, y1, x1 + SQUARE_SIZE, y1 + SQUARE_SIZE, priority)
+        sq_img_str = 'white_square' if square.color() == Color.WHITE else 'black_square'
+        Drawable.__init__(self, x1, y1, image_library, sq_img_str)
         self.square = square
-        self.move_image = move_image
+        self.move_image = 'valid_move'
         self.selected = False
         self.has_move = False
 
     def draw(self, surface: Surface):
         Drawable.draw(self, surface)
         if self.selected:
-            block = Surface((64,64))
+            block = Surface((SQUARE_SIZE,SQUARE_SIZE))
             block.fill((255,0,0,100))
             surface.blit(block, (self.draw_x1,self.draw_y1))
         if self.has_move:
-            surface.blit(self.move_image, (self.draw_x1,self.draw_y1))
+            surface.blit(self.image_library[self.move_image], (self.draw_x1,self.draw_y1))
 
     def recieve_click(self, event: Event) -> bool:
         return super().recieve_click(event)
@@ -32,13 +32,13 @@ class SquareController(Clickable, Drawable):
         pass
 
 class PieceController(Clickable, Drawable):
-    def __init__(self, piece, take_image,
-                x1, y1, x2, y2, priority,
-                image):
-        Clickable.__init__(self, x1, y1, x2, y2, priority)
-        Drawable.__init__(self, x1, y1, image)
+    def __init__(self, piece, image_library: ImageLibrary,
+                x1, y1, priority):
+        image = get_piece_image_name(piece.color, piece.type)
+        Clickable.__init__(self, x1, y1, x1 + SQUARE_SIZE, y1 + SQUARE_SIZE, priority)
+        Drawable.__init__(self, x1, y1, image_library, image)
         self.piece = piece
-        self.take_image = take_image
+        self.take_image = 'valid_take'
         self.is_held = False
         self.can_be_taken = False
 
@@ -54,7 +54,7 @@ class PieceController(Clickable, Drawable):
     def draw(self, surface: Surface):
         Drawable.draw(self, surface)
         if self.can_be_taken:
-            surface.blit(self.take_image, (self.draw_x1,self.draw_y1))
+            surface.blit(self.image_library[self.take_image], (self.draw_x1,self.draw_y1))
 
     def set_held_piece(self):
         self.is_held = True
@@ -66,6 +66,8 @@ class PieceController(Clickable, Drawable):
         self.draw_y1 = self.y1
         self.priority = self.priority - 1
         
+    def update_image(self):
+        self.image = get_piece_image_name(self.piece.color, self.piece.type)
 
 def get_square_controller(square_controllers: list[SquareController], sq: Square):
     sc = None
@@ -85,14 +87,14 @@ def get_piece_controller(piece_controllers: list[PieceController], piece):
     return piece_controller
 
 class BoardController(Drawable):
-    def __init__(self, chess_game: ChessBoard, color,
+    def __init__(self, chess_game: ChessBoard, image_library: ImageLibrary, color,
                  board_x, board_y):
         board_draw = Surface((8*SQUARE_SIZE, 8*SQUARE_SIZE))
         board_draw.fill((255,255,255))
-        Drawable.__init__(self, board_x, board_x, board_draw)
+        Drawable.__init__(self, board_x, board_x, image_library, board_draw)
         self.game = chess_game
-        self.piece_controllers = []
-        self.square_controllers = []
+        self.piece_controllers: list[PieceController] = []
+        self.square_controllers: list[SquareController] = []
         self.selected_piece = None
         self.held_piece = None
         self.color = color
@@ -100,18 +102,14 @@ class BoardController(Drawable):
         self.board_y = board_y
         self.priority = 0
 
-    def setup(self, images: ImageLibrary, mouse: Mouse):
+    def setup(self, mouse: Mouse):
         for square, piece in self.game.board.items():
-            sq_img = images.get('white_square')
-            if get_square_color(square):
-                sq_img = images.get('black_square')
             pos = get_square_pos(self.board_x, self.board_y, square, self.color)
-
-            sc = SquareController(square, images.get('valid_move'), pos[0], pos[1], pos[0] + SQUARE_SIZE, pos[1] + SQUARE_SIZE, 1, sq_img)
+            sc = SquareController(square, self.image_library, pos[0], pos[1], 1)
             self.square_controllers.append(sc)
             mouse.register_button_observer(sc)
             if piece != None:
-                pc = PieceController(piece, images.get('valid_take'), pos[0], pos[1], pos[0] + SQUARE_SIZE, pos[1] + SQUARE_SIZE, 2 , images.get(get_piece_image_name(piece.color, piece.type)))
+                pc = PieceController(piece, self.image_library, pos[0], pos[1], 2)
                 self.piece_controllers.append(pc)
                 mouse.register_button_observer(pc) 
                 mouse.register_motion_observer(pc)
@@ -139,6 +137,7 @@ class BoardController(Drawable):
             p.y1 = y
             p.x2 = x + SQUARE_SIZE
             p.y2 = y + SQUARE_SIZE
+            p.update_image()
         self.piece_controllers.sort(key=lambda p: p.priority)
     
     def select_piece(self, piece: PieceController):

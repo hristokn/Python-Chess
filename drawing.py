@@ -31,24 +31,31 @@ class ImageLibrary:
         self.images = images
         self.loaded_images = {}
     
-    def get(self, img_name: str):
+    def __getitem__(self, item):
+        if item not in self:
+            raise KeyError
         try:
-            return self.loaded_images[img_name]
+            return self.loaded_images[item]
         except KeyError:
-            img = loadImage(self.images[img_name])
-            self.loaded_images[img_name] = img
+            img = loadImage(self.images[item])
+            self.loaded_images[item] = img
             return img
 
+    def __contains__(self, item):
+        return item in self.images
+
 class Drawable(ABC):
-    def __init__(self, x1, y1, image: Surface):
+    def __init__(self, x1, y1, image_library: ImageLibrary, image: str):
         self.draw_x1 = x1
         self.draw_y1 = y1 
+        self.image_library: ImageLibrary = image_library
         self.image = image
 
     def draw(self, surface: Surface):
-        if self.image != None:
-            surface.blit(self.image, (self.draw_x1,self.draw_y1))
-
+        try: 
+            surface.blit(self.image_library[self.image], (self.draw_x1, self.draw_y1))
+        except KeyError:
+            pass
 
 def loadImage(fileName):
     if isfile(fileName):
@@ -72,12 +79,6 @@ def get_square_pos(board_x, board_y, square: Square, color: Color) -> tuple[int,
 
     return (x,y)
 
-def get_square_color(square: Square):
-    rank = int(square.value / 8)
-    file = square.value % 8
-    if (rank + file) % 2 == 0:
-        return True
-    return False
 
 def get_piece_image_name(color: Color, type: PieceType):
     match color, type:

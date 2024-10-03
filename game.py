@@ -15,6 +15,7 @@ class Game:
         self.custom_events = {}
         self.objects = []
         self.mouse = Mouse()
+        self.image_library = ImageLibrary(self._get_images())
 
         self._add_custom_events()
 
@@ -77,15 +78,14 @@ class ChessGame(Game):
         self.board_x = 100
         self.board_y = 100
         self.color = Color.WHITE
-        self.image_library = ImageLibrary(self._get_images())
         self.selected_piece = None
         self.held_piece = None
 
     def run(self):
-        game = ChessBoard(self.color)
+        game = ChessBoard(Color.WHITE)
         game.start()
-        self.board_controller = BoardController(game, self.color, self.board_x, self.board_y)
-        self.board_controller.setup(self.image_library, self.mouse)
+        self.board_controller = BoardController(game, self.image_library, self.color, self.board_x, self.board_y)
+        self.board_controller.setup(self.mouse)
         self.add_object(self.board_controller)
         super().run()
 
