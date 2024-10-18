@@ -23,7 +23,8 @@ IMAGES = {
         'white_king': 'images/white_king.png',
         'white_queen': 'images/white_queen.png',
         'valid_move': 'images/valid_move.png',
-        'valid_take': 'images/take.png'
+        'valid_take': 'images/take.png',
+        'selected_square': 'images/selected.png',
         }
 
 class ImageLibrary:

@@ -13,15 +13,14 @@ class SquareController(Clickable, Drawable):
         Drawable.__init__(self, x1, y1, image_library, sq_img_str)
         self.square = square
         self.move_image = 'valid_move'
+        self.selected_square_image = 'selected_square' 
         self.selected = False
         self.has_move = False
 
     def draw(self, surface: Surface):
         Drawable.draw(self, surface)
         if self.selected:
-            block = Surface((SQUARE_SIZE,SQUARE_SIZE))
-            block.fill((255,0,0,100))
-            surface.blit(block, (self.draw_x1,self.draw_y1))
+            surface.blit(self.image_library[self.selected_square_image], (self.draw_x1,self.draw_y1))
         if self.has_move:
             surface.blit(self.image_library[self.move_image], (self.draw_x1,self.draw_y1))
 
