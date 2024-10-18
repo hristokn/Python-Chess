@@ -22,19 +22,28 @@ class Clickable(ABC):
 
     @abstractmethod
     def recieve_click(self, event: Event) -> bool:
-        if event.type == MOUSEBUTTONUP and event.button == LEFTMOUSEBUTTON:
-            self.left_buttop_up = True
-        elif event.type == MOUSEBUTTONUP and event.button == RIGHTMOUSEBUTTON:
-            self.right_buttop_up = True
-        elif event.type == MOUSEBUTTONDOWN and event.button == LEFTMOUSEBUTTON:
-            self.left_buttop_down = True
-        elif event.type == MOUSEBUTTONDOWN and event.button == RIGHTMOUSEBUTTON:
-            self.right_buttop_down = True
-        return True
+        x,y = event.pos
+        if self.collides(x,y):
+            if event.type == MOUSEBUTTONUP and event.button == LEFTMOUSEBUTTON:
+                self.left_buttop_up = True
+            elif event.type == MOUSEBUTTONUP and event.button == RIGHTMOUSEBUTTON:
+                self.right_buttop_up = True
+            elif event.type == MOUSEBUTTONDOWN and event.button == LEFTMOUSEBUTTON:
+                self.left_buttop_down = True
+            elif event.type == MOUSEBUTTONDOWN and event.button == RIGHTMOUSEBUTTON:
+                self.right_buttop_down = True
+
+        return False
 
     @abstractmethod
     def recieve_mouse_motion(self, event: Event):
         pass
+
+    def clear(self):
+        self.left_buttop_up = False
+        self.right_buttop_up = False
+        self.left_buttop_down = False
+        self.right_buttop_down = False
 
 class Mouse:
     def __init__(self) -> None:
@@ -50,11 +59,7 @@ class Mouse:
             raise ValueError
 
     def mouse_button(self, event):
-        x = event.pos[0]
-        y = event.pos[1]
-        
         for clickable in self.button_observer:
-            if clickable.collides(x, y):
                 if clickable.recieve_click(event):
                     break
 

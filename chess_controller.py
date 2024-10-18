@@ -25,8 +25,11 @@ class SquareController(Clickable, Drawable):
             surface.blit(self.image_library[self.move_image], (self.draw_x1,self.draw_y1))
 
     def recieve_click(self, event: Event) -> bool:
-        return super().recieve_click(event)
-
+        super().recieve_click(event)
+        x,y = event.pos
+        if self.collides(x,y):
+            return True
+        
     def recieve_mouse_motion(self, event: Event):
         pass
 
@@ -42,7 +45,10 @@ class PieceController(Clickable, Drawable):
         self.can_be_taken = False
 
     def recieve_click(self, event: Event) -> bool:
-        return super().recieve_click(event)
+        super().recieve_click(event)
+        x,y = event.pos
+        if self.collides(x,y):
+            return True
 
     def recieve_mouse_motion(self, event: Event):
         x,y = event.pos
@@ -85,10 +91,12 @@ def get_piece_controller(piece_controllers: list[PieceController], piece):
             break
     return piece_controller
 
-class BoardController(Drawable):
+class BoardController(Drawable, Clickable):
     def __init__(self, chess_game: ChessBoard, image_library: ImageLibrary, color,
                  board_x, board_y):
-        board_draw = Surface((8*SQUARE_SIZE, 8*SQUARE_SIZE))
+        width = 8 * SQUARE_SIZE
+        Clickable.__init__(self, board_x, board_y, board_x + width, board_y + width, 10)
+        board_draw = Surface((width, width))
         board_draw.fill((255,255,255))
         Drawable.__init__(self, board_x, board_x, image_library, board_draw)
         self.game = chess_game
@@ -99,9 +107,9 @@ class BoardController(Drawable):
         self.color = color
         self.board_x = board_x
         self.board_y = board_y
-        self.priority = 0
 
     def setup(self, mouse: Mouse):
+        mouse.register_button_observer(self)
         for square, piece in self.game.board.items():
             pos = get_square_pos(self.board_x, self.board_y, square, self.color)
             sc = SquareController(square, self.image_library, pos[0], pos[1], 1)
@@ -224,6 +232,12 @@ class BoardController(Drawable):
         if isinstance(obj, SquareController):
             self.squareup(obj)
 
+    def outside_click(self):
+        if self.held_piece != None:
+            self.clear_held_piece()
+        if self.selected_piece != None:
+            self.deselect_piece()
+
     def pieceup(self, piece):
         if self.selected_piece == piece:
             self.clear_held_piece()
@@ -251,3 +265,13 @@ class BoardController(Drawable):
         if self.game.play_move(self.selected_piece.piece, square):
             self.update_pieces()
         
+
+    def recieve_click(self, event: Event) -> bool:
+        x,y = event.pos
+        if not self.collides(x,y):
+            self.outside_click()
+        return False
+
+    
+    def recieve_mouse_motion(self, event: Event):
+        return super().recieve_mouse_motion(event)
