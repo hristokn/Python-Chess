@@ -25,6 +25,8 @@ IMAGES = {
         'valid_move': 'images/valid_move.png',
         'valid_take': 'images/take.png',
         'selected_square': 'images/selected.png',
+        'button_rotate': 'images/button_rotate.png',
+        'button_rotate_pressed': 'images/button_rotate_pressed.png',
         }
 
 class ImageLibrary:

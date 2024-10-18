@@ -4,6 +4,8 @@ from mouse import Mouse
 from chess.chess import ChessBoard
 from chess.enums import Color
 from drawing import ImageLibrary, IMAGES
+from view import Button
+
 
 class Game:
     def __init__(self, width: int, height: int, framerate: int = 30):
@@ -87,6 +89,9 @@ class ChessGame(Game):
         self.board_controller = BoardController(game, self.image_library, self.color, self.board_x, self.board_y)
         self.board_controller.setup(self.mouse)
         self.add_object(self.board_controller)
+        button = Button(0, 0, 1, self.image_library, 'button_rotate', 'button_rotate_pressed')
+        self.add_object(button)
+        self.mouse.register_button_observer(button)
         super().run()
 
     def update(self):
