@@ -1,11 +1,18 @@
 from pygame import Surface
-from mouse import Clickable, MOUSEBUTTONUP, MOUSEBUTTONDOWN, LEFTMOUSEBUTTON, RIGHTMOUSEBUTTON
+from mouse import Clickable
 from pygame.event import Event
 from drawing import Drawable
 
 class View(Clickable, Drawable):
     def __init__(self, x1, y1, priority, img_lib, img):
-        x2, y2 = img_lib[img].get_size()
+        x2 = x1
+        y2 = y1
+        try:
+            _x2, _y2 = img_lib[img].get_size()
+            x2 += _x2 
+            y2 += _y2 
+        except KeyError:
+            pass
         Clickable.__init__(self, x1, y1, x2, y2, priority)
         Drawable.__init__(self, x1, y1, img_lib, img)
 
