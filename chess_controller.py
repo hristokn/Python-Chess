@@ -1,5 +1,6 @@
 from mouse import Clickable, LEFTMOUSEBUTTON, RIGHTMOUSEBUTTON, MOUSEBUTTONUP, MOUSEBUTTONDOWN, MOUSEMOTION, Mouse
 from pygame.event import Event
+from custom_events import CustomEvent, post_event
 from pygame import Surface
 from drawing import Drawable, get_square_pos, SQUARE_SIZE, ImageLibrary, get_piece_image_name
 from chess.chess import ChessBoard, Square, Color
@@ -264,6 +265,7 @@ class BoardController(Drawable, Clickable):
             square = target.square
         if self.game.play_move(self.selected_piece.piece, square):
             self.update_pieces()
+            post_event(CustomEvent.PLAYED_MOVE)
         
 
     def recieve_click(self, event: Event) -> bool:
