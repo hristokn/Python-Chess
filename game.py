@@ -7,6 +7,7 @@ from drawing import ImageLibrary, IMAGES
 from view import Button
 from custom_events import CustomEvent
 from taken_pieces_display import TakenPiecesDisplay
+
 class Game:
     def __init__(self, width: int, height: int, framerate: int = 30):
         pygame.init()
