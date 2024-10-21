@@ -9,8 +9,14 @@ class AutoEvent(Enum):
 class CustomEvent(AutoEvent):
     PLAYED_MOVE = auto()
 
-def post_event(event: CustomEvent):
-    post(Event(event.value))
+def post_event(event: CustomEvent, **kwargs):
+    event = Event(event.value)
+    for keyword, arg in kwargs.items():
+        if not hasattr(event, keyword):
+            setattr(event, keyword, arg)
+        else:
+            raise ValueError
+    post(event)
 
 
 class EventListener:

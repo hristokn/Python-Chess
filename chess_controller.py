@@ -263,9 +263,11 @@ class BoardController(Drawable, Clickable):
             square = self.game.find_square(target)
         else:
             square = target.square
+
+        _color=self.game.color_to_play
         if self.game.play_move(self.selected_piece.piece, square):
             self.update_pieces()
-            post_event(CustomEvent.PLAYED_MOVE)
+            post_event(CustomEvent.PLAYED_MOVE, color=_color)
         
 
     def recieve_click(self, event: Event) -> bool:
