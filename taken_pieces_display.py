@@ -16,7 +16,7 @@ class TakenPiecesDisplay(View, EventListener):
 
     
     def draw(self, surface: Surface):
-        offset = self._margin
+        offset = 0
         for type, count in self._display:
             for i in range(count):
                 offset += self._margin

@@ -7,6 +7,7 @@ from drawing import ImageLibrary, IMAGES
 from view import Button
 from custom_events import CustomEvent
 from taken_pieces_display import TakenPiecesDisplay
+from timer import TimerBox
 
 class Game:
     def __init__(self, width: int, height: int, framerate: int = 30):
@@ -52,7 +53,7 @@ class Game:
              obj.update()
 
     def draw(self):
-        self.screen.fill("purple")
+        self.screen.fill("gray")
 
         for obj in self.objects:
             try:
@@ -78,8 +79,8 @@ class Game:
 class ChessGame(Game):
     def __init__(self, width: int, height: int, framerate: int = 30):
         super().__init__(width, height, framerate)
-        self.board_x = 100
-        self.board_y = 100
+        self.board_x = 20
+        self.board_y = 80
         self.color = Color.WHITE
 
     def run(self):
@@ -88,11 +89,22 @@ class ChessGame(Game):
         self.board_controller = BoardController(game, self.image_library, self.color, self.board_x, self.board_y)
         self.board_controller.setup(self.mouse)
         self.add_object(self.board_controller)
-        button = Button(0, 0, 1, self.image_library, 'button_rotate', 'button_rotate_pressed')
+        
+        button = Button(550, 554, 1, self.image_library, 'button_rotate', 'button_rotate_pressed')
         self.add_object(button)
         self.mouse.register_button_observer(button)
-        taken_white_pieces_display = TakenPiecesDisplay(30, 30, 1, self.image_library, '', game, Color.WHITE)
+        
+        taken_white_pieces_display = TakenPiecesDisplay(20, 20, 1, self.image_library, '', game, Color.BLACK)
         self.add_object(taken_white_pieces_display)
+
+        taken_black_pieces_display = TakenPiecesDisplay(20, 594, 1, self.image_library, '', game, Color.WHITE)
+        self.add_object(taken_black_pieces_display)
+
+        timer = TimerBox(600,80,1,self.image_library, '', 120, Color.BLACK)
+        self.add_object(timer)
+
+        timer = TimerBox(600,564,1,self.image_library, '', 120, Color.WHITE)
+        self.add_object(timer)
         super().run()
 
 
