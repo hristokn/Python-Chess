@@ -3,7 +3,7 @@ from pygame import Surface
 from pygame.event import Event
 from chess.chess import ChessBoard
 from chess.enums import PieceType, Color
-from drawing import get_piece_image_name
+from drawing import get_piece_image_name_tiny
 from custom_events import EventListener, CustomEvent
 
 class TakenPiecesDisplay(View, EventListener):
@@ -12,7 +12,7 @@ class TakenPiecesDisplay(View, EventListener):
         self._game: ChessBoard = game
         self._color: Color = color
         self._display: dict[PieceType, int] = {}
-        self._margin = 50
+        self._margin = 30
 
     
     def draw(self, surface: Surface):
@@ -20,7 +20,7 @@ class TakenPiecesDisplay(View, EventListener):
         for type, count in self._display:
             for i in range(count):
                 offset += self._margin
-                surface.blit(self.image_library[get_piece_image_name(self._color, type)], (self.draw_x1 + offset, self.draw_y1))
+                surface.blit(self.image_library[get_piece_image_name_tiny(self._color, type)], (self.draw_x1 + offset, self.draw_y1))
 
 
     def update(self):

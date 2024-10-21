@@ -22,6 +22,18 @@ IMAGES = {
         'white_bishop': 'images/white_bishop.png',
         'white_king': 'images/white_king.png',
         'white_queen': 'images/white_queen.png',
+        'black_pawn_tiny': 'images/black_pawn_tiny.png',
+        'black_rook_tiny': 'images/black_rook_tiny.png',
+        'black_knight_tiny': 'images/black_knight_tiny.png',
+        'black_bishop_tiny': 'images/black_bishop_tiny.png',
+        'black_king_tiny': 'images/black_king_tiny.png',
+        'black_queen_tiny': 'images/black_queen_tiny.png',
+        'white_pawn_tiny': 'images/white_pawn_tiny.png',
+        'white_rook_tiny': 'images/white_rook_tiny.png',
+        'white_knight_tiny': 'images/white_knight_tiny.png',
+        'white_bishop_tiny': 'images/white_bishop_tiny.png',
+        'white_king_tiny': 'images/white_king_tiny.png',
+        'white_queen_tiny': 'images/white_queen_tiny.png',
         'valid_move': 'images/valid_move.png',
         'valid_take': 'images/take.png',
         'selected_square': 'images/selected.png',
@@ -111,3 +123,7 @@ def get_piece_image_name(color: Color, type: PieceType):
             return "black_king"
         case _, _:
             raise NotImplementedError
+        
+
+def get_piece_image_name_tiny(color: Color, type: PieceType):
+    return get_piece_image_name(color, type) + '_tiny'
