@@ -110,6 +110,7 @@ class BoardController(Drawable, Clickable):
         self.board_y = board_y
 
     def setup(self, mouse: Mouse):
+        self.mouse = mouse
         mouse.register_button_observer(self)
         for square, piece in self.game.board.items():
             pos = get_square_pos(self.board_x, self.board_y, square, self.color)
@@ -134,10 +135,12 @@ class BoardController(Drawable, Clickable):
         self.handle_clicked_pieces()
 
     def update_pieces(self):
+        removed = []
         for p in self.piece_controllers:
             square = self.game.find_square(p.piece)
             if square == Square.UNKNOWN:
-                self.piece_controllers.remove(p)
+                removed.append(p)
+                continue
             x, y = get_square_pos(self.board_x, self.board_y, square, self.color)
             p.draw_x1 = x
             p.draw_y1 = y
@@ -146,6 +149,10 @@ class BoardController(Drawable, Clickable):
             p.x2 = x + SQUARE_SIZE
             p.y2 = y + SQUARE_SIZE
             p.update_image()
+        for p in removed:
+            self.piece_controllers.remove(p)
+            self.mouse.unregister_button_observer(p)
+            self.mouse.unregister_motion_observer(p)
         self.piece_controllers.sort(key=lambda p: p.priority)
     
     def select_piece(self, piece: PieceController):
