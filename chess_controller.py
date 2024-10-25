@@ -39,6 +39,7 @@ class PieceController(View):
         self.take_image = 'valid_take'
         self.is_held = False
         self.can_be_taken = False
+        self._default_priority = priority
 
     def recieve_click(self, event: Event) -> bool:
         super().recieve_click(event)
@@ -59,13 +60,13 @@ class PieceController(View):
 
     def set_held_piece(self):
         self.is_held = True
-        self.priority = self.priority + 1
+        self.priority = self._default_priority + 1
 
     def clear_held_piece(self):
         self.is_held = False
         self.draw_x1 = self.x1
         self.draw_y1 = self.y1
-        self.priority = self.priority - 1
+        self.priority = self._default_priority
         
     def update_image(self):
         self.image = get_piece_image_name(self.piece.color, self.piece.type)
