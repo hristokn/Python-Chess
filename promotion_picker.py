@@ -5,7 +5,7 @@ from pygame import Surface
 from chess.enums import PieceType, Color
 
 class PromotionPicker(View):
-    def __init__(self, x1, y1, priority, img_lib: ImageLibrary, color: Color, draw_down, click_function):
+    def __init__(self, board_x, board_y, x1, y1, priority, img_lib: ImageLibrary, color: Color, draw_down, click_function):
         self.background = Surface((SQUARE_SIZE, SQUARE_SIZE*4))
         self.background.fill('grey')
         super().__init__(x1, y1, priority, img_lib, '')
@@ -25,18 +25,32 @@ class PromotionPicker(View):
                         get_piece_image_name(color, PieceType.BISHOP),
                         click_function, PieceType.BISHOP)]
 
+        self._board_x = board_x
+        self._board_y = board_y
+
+        self._draw_down = draw_down
         if not draw_down:
             self.order_queen_on_bottom()
 
     def rotate(self):
         self._draw_down = not self._draw_down
+
+        board_start = self._board_x
+        board_end = board_start + SQUARE_SIZE * 7
+        offset = self.x1 - board_start
+        picker_start = board_end - offset
+
         half_chess_board = SQUARE_SIZE * 4
-        if not self._draw_down:
+        if self._draw_down:
             half_chess_board = half_chess_board * -1
         self.y1 += half_chess_board
         self.y2 += half_chess_board
         self.draw_y1 += half_chess_board
+        self.x1 = picker_start
+        self.x2 = picker_start
+        self.draw_x1 = picker_start
         
+        self.align_buttons()
         if self._draw_down:
             self.order_queen_on_top()
         else:
@@ -58,6 +72,12 @@ class PromotionPicker(View):
                 button.draw_y1 = button.y1
                 i += 1
 
+    def align_buttons(self):
+        for button in self._buttons:
+            button.x1 = self.x1
+            button.x2 = button.x1 + SQUARE_SIZE
+            button.draw_x1 = button.x1
+    
     def recieve_click(self, event: Event) -> bool:
         return False
     

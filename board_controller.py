@@ -3,7 +3,7 @@ from pygame.event import Event
 from custom_events import CustomEvent, post_event
 from pygame import Surface
 from drawing import Drawable, get_square_pos, SQUARE_SIZE, ImageLibrary
-from chess.chess import ChessBoard, Square
+from chess.chess import ChessBoard, Square, Color
 from chess_controller import SquareController, PieceController
 from promotion_picker import PromotionPicker
 
@@ -57,6 +57,23 @@ class BoardController(Drawable, Clickable):
                 self.piece_controllers.append(pc)
                 mouse.register_button_observer(pc) 
                 mouse.register_motion_observer(pc)
+
+    def rotate(self):
+        self.color = Color.WHITE if self.color == Color.BLACK else Color.BLACK
+        _square_controllers = []
+        for sc in self.square_controllers:
+            self.mouse.unregister_button_observer(sc)
+            square = sc.square
+            pos = get_square_pos(self.board_x, self.board_y, square, self.color)
+            _sc = SquareController(square, self.image_library, pos[0], pos[1], 1)
+            _square_controllers.append(_sc)
+            self.mouse.register_button_observer(_sc)
+        
+        self.square_controllers = _square_controllers
+        if self._promotion_picker != None:
+            self._promotion_picker.rotate()    
+
+        self.update_pieces()    
 
     def draw(self, surface):
         Drawable.draw(self, surface)
@@ -205,7 +222,7 @@ class BoardController(Drawable, Clickable):
         if not draw_down:
             y -= SQUARE_SIZE*3
 
-        self._promotion_picker = PromotionPicker(x, y, 5, self.image_library, self.game.color_to_play, draw_down, self.pick_promotion)
+        self._promotion_picker = PromotionPicker(self.board_x, self.board_y, x, y, 5, self.image_library, self.game.color_to_play, draw_down, self.pick_promotion)
         for button in self._promotion_picker._buttons:
             self.mouse.register_button_observer(button)
         self.mouse.register_button_observer(self._promotion_picker)

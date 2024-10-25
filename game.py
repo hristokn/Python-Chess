@@ -1,5 +1,5 @@
 import pygame
-from chess_controller import *
+from board_controller import BoardController
 from mouse import Mouse
 from chess.chess import ChessBoard
 from chess.enums import Color
@@ -90,7 +90,7 @@ class ChessGame(Game):
         self.board_controller.setup(self.mouse)
         self.add_object(self.board_controller)
         
-        button = Button(550, 554, 1, self.image_library, 'button_rotate', 'button_rotate_pressed', lambda x : x)
+        button = Button(550, 554, 1, self.image_library, 'button_rotate', 'button_rotate_pressed', self.board_controller.rotate)
         self.add_object(button)
         self.mouse.register_button_observer(button)
         
