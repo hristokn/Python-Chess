@@ -127,3 +127,12 @@ def get_piece_image_name(color: Color, type: PieceType):
 
 def get_piece_image_name_tiny(color: Color, type: PieceType):
     return get_piece_image_name(color, type) + '_tiny'
+
+def get_square_image(square: Square):
+    match square.color():
+        case Color.WHITE:
+            return 'white_square'
+        case Color.BLACK:
+            return 'black_square'
+        case _:
+            raise NotImplementedError        

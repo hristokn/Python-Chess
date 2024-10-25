@@ -8,10 +8,9 @@ class Piece:
         self.color = color
         self.type = piece_type
         self.orientation = get_orientation(color)
-        self.move_logic = get_logic(self.type)
 
     def get_moves(self, square, prev_moves, chess_board):
-        return self.move_logic(square, chess_board, prev_moves, self.orientation)
+        return get_logic(self.type)(square, chess_board, prev_moves, self.orientation)
     
     def __str__(self) -> str:
         return str(self.type)

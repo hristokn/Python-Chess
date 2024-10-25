@@ -16,13 +16,18 @@ class View(Clickable, Drawable):
         Clickable.__init__(self, x1, y1, x2, y2, priority)
         Drawable.__init__(self, x1, y1, img_lib, img)
 
+    def update(self):
+        pass
+
 
 
 class Button(View):
-    def __init__(self, x1, y1, priority, img_lib, button_img, pressed_button_img):
+    def __init__(self, x1, y1, priority, img_lib, button_img,
+                pressed_button_img, click_function):
         View.__init__(self, x1, y1, priority, img_lib, button_img)
         self._pressed_button_img = pressed_button_img
         self._is_held = False
+        self._click_function = click_function
 
     def recieve_click(self, event: Event) -> bool:
         super().recieve_click(event)
@@ -48,8 +53,11 @@ class Button(View):
     def release_button(self):
         self._is_held = False
 
+    def _click(self, **kwargs):
+        self._click_function(**kwargs)
+
     def click(self):
-        print('Yooooo')
+        self._click()
 
     def draw(self, surface: Surface):
         if not self._is_held:

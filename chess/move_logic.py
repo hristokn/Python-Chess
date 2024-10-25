@@ -2,6 +2,7 @@ from chess.squares import Square, Orientation
 from chess.moves import Move
 from chess.enums import PieceType
 from typing import Callable
+from copy import deepcopy
 class Piece:
     pass
 
@@ -14,9 +15,9 @@ def line_attack(square: Square, board: dict[Square: Piece], direction: Callable[
     while sq != Square.UNKNOWN and (board[sq] == None or board[sq].color != piece.color):
         changes = {square: None, sq: piece}
         if board[sq] == None:
-            moves.append(Move(changes,[], piece))
+            moves.append(Move(changes,[], piece, sq))
         else:
-            moves.append(Move(changes,[board[sq]], piece))
+            moves.append(Move(changes,[board[sq]], piece, sq))
             break
         sq = direction(sq)
     return moves
@@ -28,7 +29,7 @@ def one_step_only_take(square: Square, board: dict[Square: Piece], direction: Ca
     sq = direction(square)
     if sq != Square.UNKNOWN and board[sq] != None and board[sq].color != piece.color:
         changes = {square: None, sq: piece}
-        moves.append(Move(changes,[board[sq]], piece))
+        moves.append(Move(changes,[board[sq]], piece, sq))
     return moves
 
 def one_step_only_move(square: Square, board: dict[Square: Piece], direction: Callable[[Square],Square]):
@@ -37,7 +38,7 @@ def one_step_only_move(square: Square, board: dict[Square: Piece], direction: Ca
     sq = direction(square)
     if sq != Square.UNKNOWN and board[sq] == None:
         changes = {square: None, sq: piece}
-        moves.append(Move(changes,[], piece))
+        moves.append(Move(changes,[], piece, sq))
     return moves
 
 def one_step_attack(square: Square, board: dict[Square: Piece], direction: Callable[[Square],Square]):
@@ -71,6 +72,24 @@ def last_move_is_long_pawn_move(prev_moves: list[Move]):
         return True
     return False
 
+def can_promote(move: Move, direction):
+    if move.get_end_square() != Square.UNKNOWN and direction(move.get_end_square()) == Square.UNKNOWN:
+        return True
+
+def promote(move: Move):
+    moves = []
+
+    types_to_promote = [PieceType.BISHOP, PieceType.QUEEN, PieceType.KNIGHT, PieceType.ROOK] 
+    for type in types_to_promote:
+        new_piece = deepcopy(move.piece)
+        new_piece.type = type
+        new_changes = deepcopy(move.changes)
+        new_changes[move.get_end_square()] = new_piece
+        new_move = Move(new_changes, move.taken, move.piece, move.get_end_square())
+        moves.append(new_move)
+
+    return moves
+
 def castle(square: Square, board: dict[Square: Piece], prev_moves: list[Move], direction: Callable[[Square],Square]):
     moves = []
     king = board[square]
@@ -82,7 +101,7 @@ def castle(square: Square, board: dict[Square: Piece], prev_moves: list[Move], d
     sq3 = direction(sq2)
     sq4 = direction(sq3)
     rook_square = Square.UNKNOWN
-    move = Move({square: None, sq2: king}, [], king)
+    move = Move({square: None, sq2: king}, [], king, sq2)
     if sq4 != Square.UNKNOWN and board[sq1] == None and board[sq2] == None and board[sq3] == None:
         rook_square = sq4
     elif sq3 != Square.UNKNOWN and board[sq1] == None and board[sq2] == None:
@@ -115,8 +134,15 @@ def pawn_move_logic(square: Square, board: dict[Square: Piece], prev_moves: list
         last_move_end_square = last_move.get_end_square()
         if orientaion.left(square) == last_move_end_square or orientaion.right(square) == last_move_end_square:
             end_square = orientaion.up(last_move_end_square)
-            move = Move({square: None, last_move_end_square: None, end_square: pawn},[last_move.piece],pawn)
+            move = Move({square: None, last_move_end_square: None, end_square: pawn},[last_move.piece],pawn, end_square)
             moves.append(move)
+
+    _moves = moves.copy()
+    for move in _moves:
+        if can_promote(move, orientaion.up):
+            moves.remove(move)
+            moves.extend(promote(move))
+
     return moves 
 
 

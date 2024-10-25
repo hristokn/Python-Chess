@@ -3,10 +3,11 @@ class Piece:
     pass
 
 class Move:
-    def __init__(self, changes: dict[Square: Piece], taken: list[Piece], piece: Piece):
+    def __init__(self, changes: dict[Square: Piece], taken: list[Piece], piece: Piece, end_square: Square):
         self.changes = changes
         self.taken = taken
         self.piece = piece
+        self._end_square = end_square
     
     def __eq__(self, other):
         if isinstance(other, Move):
@@ -22,14 +23,8 @@ class Move:
         return NotImplemented
     
     def get_end_square(self):
-        for sq, piece in self.changes.items():
-            if piece == self.piece:
-                return sq 
+        return self._end_square
     
                 
     def described_by(self, piece: Piece, end: Square) -> bool:
-        try:
-            correct_end = self.changes[end] == piece
-        except KeyError:
-            return False
-        return self.piece == piece and correct_end
+        return self.piece == piece and self._end_square == end

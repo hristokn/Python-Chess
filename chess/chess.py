@@ -1,4 +1,4 @@
-from chess.pieces import Piece, Move
+from chess.pieces import Piece
 from chess.enums import Color, PieceType
 from chess.squares import Square, WhiteOrientation
 from chess.moves import Move
@@ -7,9 +7,9 @@ class ChessBoard:
     def __init__(self, color: Color):
         self.board = {}
         self.standard_board(self.board)
-        self.past_moves = []
-        self.possible_moves = []
-        self.taken_pieces = []
+        self.past_moves: list[Move] = []
+        self.possible_moves: list[Move] = []
+        self.taken_pieces: list[Piece] = []
         self.color_to_play = color
 
 
@@ -57,13 +57,24 @@ class ChessBoard:
                 return sq
         return Square.UNKNOWN
     
-    def play_move(self, start: Piece, end: Square):
+    def find_move(self, start: Piece, end: Square):
         move = None
         for m in self.possible_moves:
             if m.described_by(start, end):
                 move = m
                 break
+        return move
 
+    def multiple_moves_exist(self, start: Piece, end: Square):
+        found_one = False
+        for m in self.possible_moves:
+            if found_one and m.described_by(start, end):
+                return True
+            elif m.described_by(start, end):
+                found_one = True
+        return False
+    
+    def play_move(self, move: Move | None):
         if move != None:
             self.past_moves.append(move)
             self.taken_pieces.extend(move.taken)
@@ -73,6 +84,13 @@ class ChessBoard:
             return True
         return False
 
+    def get_promotion_move(self, start:Piece, end:Square, piece_type: PieceType):
+        move = None
+        for m in self.possible_moves:
+            if m.described_by(start, end) and m.changes[m.get_end_square()].type == piece_type:
+                move = m
+                break
+        return move
 
     def prepare_turn(self):
         self.color_to_play = self.next_color()

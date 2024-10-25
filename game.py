@@ -90,7 +90,7 @@ class ChessGame(Game):
         self.board_controller.setup(self.mouse)
         self.add_object(self.board_controller)
         
-        button = Button(550, 554, 1, self.image_library, 'button_rotate', 'button_rotate_pressed')
+        button = Button(550, 554, 1, self.image_library, 'button_rotate', 'button_rotate_pressed', lambda x : x)
         self.add_object(button)
         self.mouse.register_button_observer(button)
         
