@@ -8,6 +8,8 @@ from view import Button
 from custom_events import CustomEvent
 from taken_pieces_display import TakenPiecesDisplay
 from timer import TimerBox
+from custom_events import EventAnnouncer
+
 
 class Game:
     def __init__(self, width: int, height: int, framerate: int = 30):
@@ -19,7 +21,8 @@ class Game:
         self.objects = []
         self.mouse = Mouse()
         self.image_library = ImageLibrary(self._get_images())
-
+        self.event_announcer = EventAnnouncer()
+        self.event_announcer.register_observer(self.mouse)
 
     def run(self):
         self.running = True
@@ -36,17 +39,8 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            elif (
-            event.type == pygame.MOUSEBUTTONDOWN 
-            or event.type == pygame.MOUSEBUTTONUP
-            or event.type == pygame.MOUSEMOTION):
-                self.handle_click(event)
             else:
-                for event_listener in self.objects:
-                    try:
-                        event_listener.receive_event(event)
-                    except AttributeError:
-                        pass
+                self.event_announcer.announce_event(event)
 
         pygame.event.pump()
         for obj in self.objects:

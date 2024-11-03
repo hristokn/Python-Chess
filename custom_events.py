@@ -19,6 +19,21 @@ def post_event(event: CustomEvent, **kwargs):
     post(event)
 
 
-class EventListener:
+class EventObserver:
     def receive_event(self, event):
         pass
+
+
+class EventAnnouncer:
+    def __init__(self) -> None:
+        self.observers : list[EventObserver]  = []
+
+    def announce_event(self, event: Event):
+        for observer in self.observers:
+            observer.receive_event(event)
+
+    def register_observer(self, observer: EventObserver):
+        self.observers.append(observer)
+
+    def unregister_observer(self, observer: EventObserver):
+        self.observers.remove(observer)

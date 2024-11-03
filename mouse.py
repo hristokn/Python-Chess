@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from pygame.event import Event
+from custom_events import EventObserver
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION
 
 LEFTMOUSEBUTTON = 1
@@ -45,18 +46,16 @@ class Clickable(ABC):
         self.left_buttop_down = False
         self.right_buttop_down = False
 
-class Mouse:
+class Mouse(EventObserver):
     def __init__(self) -> None:
         self.button_observer : list[Clickable]  = []
         self.motion_observer : list[Clickable]  = []
 
-    def process_mouse_event(self, event: Event):
+    def receive_event(self, event):
         if event.type == MOUSEBUTTONDOWN or event.type == MOUSEBUTTONUP:
             self.mouse_button(event)
         elif event.type == MOUSEMOTION:
             self.mouse_motion(event)
-        else:
-            raise ValueError
 
     def mouse_button(self, event):
         for clickable in self.button_observer:
