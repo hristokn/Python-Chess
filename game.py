@@ -4,23 +4,22 @@ from mouse import Mouse
 from chess.chess import ChessBoard
 from chess.enums import Color
 from drawing import ImageLibrary, IMAGES
-from view import Button
-from custom_events import CustomEvent
-from taken_pieces_display import TakenPiecesDisplay
-from timer import TimerBox
 from custom_events import EventAnnouncer
-
+from main_menu import MainMenu 
+from chess_screen import ChessScreen 
+from screen import Screen 
 
 class Game:
     def __init__(self, width: int, height: int, framerate: int = 30):
         pygame.init()
-        self.screen = pygame.display.set_mode((width, height))
+        self.display = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
         self.timestep = 1000 / framerate
         self.running = False
         self.objects = []
         self.mouse = Mouse()
         self.image_library = ImageLibrary(self._get_images())
+        self.screen: Screen = None
         self.event_announcer = EventAnnouncer()
         self.event_announcer.register_observer(self.mouse)
 
@@ -47,11 +46,11 @@ class Game:
              obj.update()
 
     def draw(self):
-        self.screen.fill("gray")
+        self.display.fill("gray")
 
         for obj in self.objects:
             try:
-                obj.draw(self.screen)
+                obj.draw(self.display)
             except AttributeError:
                 pass
         pygame.display.flip()
@@ -69,6 +68,12 @@ class Game:
     def handle_click(self, click: pygame.event):
         self.mouse.process_mouse_event(click)
 
+    def open_screen(self, screen:Screen):
+        if self.screen != None:
+            self.remove_object(self.screen)
+        self.screen = screen
+        self.add_object(screen)
+
 
 class ChessGame(Game):
     def __init__(self, width: int, height: int, framerate: int = 30):
@@ -78,29 +83,13 @@ class ChessGame(Game):
         self.color = Color.WHITE
 
     def run(self):
-        game = ChessBoard(Color.WHITE)
-        game.start()
-        self.board_controller = BoardController(game, self.image_library, self.color, self.board_x, self.board_y)
-        self.board_controller.setup(self.mouse)
-        self.add_object(self.board_controller)
-        
-        button = Button(550, 554, 1, self.image_library, 'button_rotate', 'button_rotate_pressed', self.board_controller.rotate)
-        self.add_object(button)
-        self.mouse.register_button_observer(button)
-        
-        taken_white_pieces_display = TakenPiecesDisplay(20, 20, 1, self.image_library, '', game, Color.BLACK)
-        self.add_object(taken_white_pieces_display)
+        main_menu = MainMenu(self.mouse, self.image_library, [self.start_chess_game], self.event_announcer)
 
-        taken_black_pieces_display = TakenPiecesDisplay(20, 594, 1, self.image_library, '', game, Color.WHITE)
-        self.add_object(taken_black_pieces_display)
-
-        timer = TimerBox(600,80,1,self.image_library, '', 120, Color.BLACK)
-        self.add_object(timer)
-
-        timer = TimerBox(600,564,1,self.image_library, '', 120, Color.WHITE)
-        self.add_object(timer)
+        self.open_screen(main_menu)
         super().run()
 
+    def start_chess_game(self):
+        self.open_screen(ChessScreen(self.mouse, self.image_library, self.event_announcer, self.color))
 
     def _get_images(self):
         return IMAGES

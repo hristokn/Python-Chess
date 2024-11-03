@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from pygame.event import Event
 from custom_events import EventObserver
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION
@@ -6,7 +5,7 @@ from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION
 LEFTMOUSEBUTTON = 1
 RIGHTMOUSEBUTTON = 2
 
-class Clickable(ABC):
+class Clickable:
     def __init__(self, x1, y1, x2, y2, priority):
         self.x1 = x1
         self.y1 = y1
@@ -21,7 +20,6 @@ class Clickable(ABC):
     def collides(self, x, y):
         return not (x <= self.x1 or x >= self.x2 or y <= self.y1 or y >= self.y2)
 
-    @abstractmethod
     def recieve_click(self, event: Event) -> bool:
         x,y = event.pos
         if self.collides(x,y):
@@ -36,7 +34,6 @@ class Clickable(ABC):
 
         return False
 
-    @abstractmethod
     def recieve_mouse_motion(self, event: Event):
         pass
 
@@ -45,6 +42,15 @@ class Clickable(ABC):
         self.right_buttop_up = False
         self.left_buttop_down = False
         self.right_buttop_down = False
+
+    def move(self, x, y):
+        width = self.x2 - self.x1
+        height = self.y2 - self.y1
+        self.x1 = x
+        self.x2 = x + width
+        self.y1 = y
+        self.y2 = y + height
+
 
 class Mouse(EventObserver):
     def __init__(self) -> None:

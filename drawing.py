@@ -60,15 +60,22 @@ class ImageLibrary:
         return item in self.images
 
 class Drawable(ABC):
-    def __init__(self, x1, y1, image_library: ImageLibrary, image: str):
+    def __init__(self, x1, y1, image_library: ImageLibrary, image: str | Surface):
         self.draw_x1 = x1
         self.draw_y1 = y1 
         self.image_library: ImageLibrary = image_library
         self.image = image
 
+    def move(self, x, y):
+        self.draw_x1 = x
+        self.draw_y1 = y
+
     def draw(self, surface: Surface):
         try: 
-            surface.blit(self.image_library[self.image], (self.draw_x1, self.draw_y1))
+            if(issubclass(self.image.__class__, Surface)):
+                surface.blit(self.image, (self.draw_x1, self.draw_y1))
+            else:
+                surface.blit(self.image_library[self.image], (self.draw_x1, self.draw_y1))
         except KeyError:
             pass
 
