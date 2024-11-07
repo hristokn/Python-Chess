@@ -39,6 +39,8 @@ IMAGES = {
         'selected_square': 'images/selected.png',
         'button_rotate': 'images/button_rotate.png',
         'button_rotate_pressed': 'images/button_rotate_pressed.png',
+        'text_button': 'images/text_button.png',
+        'text_button_pressed': 'images/text_button_pressed.png',
         }
 
 class ImageLibrary:
