@@ -77,10 +77,16 @@ class Mouse(EventObserver):
         self.button_observer.sort(key=lambda c: c.priority, reverse=True)
 
     def unregister_button_observer(self,clickable: Clickable):
-        self.button_observer.remove(clickable)
+        try: 
+            self.button_observer.remove(clickable)
+        except ValueError:
+            pass
 
     def register_motion_observer(self, clickable: Clickable):
         self.motion_observer.append(clickable)
     
     def unregister_motion_observer(self, clickable: Clickable):
-        self.motion_observer.remove(clickable)
+        try: 
+            self.motion_observer.remove(clickable)
+        except ValueError:
+            pass

@@ -1,6 +1,7 @@
 from pygame.event import Event
 from custom_events import EventAnnouncer
-from view import View, Button
+from view import View
+from button import Button
 from drawing import ImageLibrary
 from mouse import Mouse
 
@@ -18,6 +19,7 @@ class Screen:
 
     def remove_element(self, element):
         self.elements.remove(element)
+        self.free_element(element)
 
     def update(self):
         for element in self.elements:
@@ -26,3 +28,12 @@ class Screen:
     def draw(self, surface):
         for element in reversed(self.elements):
             element.draw(surface)
+
+    def free_element(self, element):
+        self.mouse.unregister_button_observer(element)
+        self.mouse.unregister_motion_observer(element)
+        self.event_announcer.unregister_observer(element)
+
+    def free_elements(self):
+        for element in self.elements:
+            self.free_element(element)

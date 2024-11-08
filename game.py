@@ -68,8 +68,9 @@ class Game:
     def handle_click(self, click: pygame.event):
         self.mouse.process_mouse_event(click)
 
-    def open_screen(self, screen:Screen):
+    def open_screen(self, screen: Screen):
         if self.screen != None:
+            self.screen.free_elements()
             self.remove_object(self.screen)
         self.screen = screen
         self.add_object(screen)
@@ -83,13 +84,10 @@ class ChessGame(Game):
         self.color = Color.WHITE
 
     def run(self):
-        main_menu = MainMenu(self.mouse, self.image_library, [self.start_chess_game], self.event_announcer)
+        main_menu = MainMenu(self.mouse, self.image_library, self.event_announcer, self.open_screen)
 
         self.open_screen(main_menu)
         super().run()
-
-    def start_chess_game(self):
-        self.open_screen(ChessScreen(self.mouse, self.image_library, self.event_announcer, self.color))
 
     def _get_images(self):
         return IMAGES

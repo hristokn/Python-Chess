@@ -36,4 +36,8 @@ class EventAnnouncer:
         self.observers.append(observer)
 
     def unregister_observer(self, observer: EventObserver):
-        self.observers.remove(observer)
+        try:
+            self.observers.remove(observer)
+        except ValueError:
+            pass
+

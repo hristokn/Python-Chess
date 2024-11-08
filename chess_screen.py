@@ -3,7 +3,7 @@ from mouse import Mouse
 from screen import Screen
 from chess.chess import ChessBoard, Color
 from board_controller import BoardController
-from view import Button
+from button import Button
 from timer import TimerBox
 from taken_pieces_display import TakenPiecesDisplay
 from custom_events import EventAnnouncer

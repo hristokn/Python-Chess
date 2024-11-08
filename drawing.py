@@ -41,6 +41,8 @@ IMAGES = {
         'button_rotate_pressed': 'images/button_rotate_pressed.png',
         'text_button': 'images/text_button.png',
         'text_button_pressed': 'images/text_button_pressed.png',
+        'button_black': 'images/button_black.png',
+        'button_white': 'images/button_white.png',
         }
 
 class ImageLibrary:

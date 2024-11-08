@@ -1,5 +1,6 @@
 from pygame.event import Event
-from view import View, Button
+from view import View
+from button import Button
 from drawing import SQUARE_SIZE, get_piece_image_name, ImageLibrary
 from pygame import Surface
 from chess.enums import PieceType, Color
