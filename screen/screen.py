@@ -1,7 +1,7 @@
 from pygame.event import Event
 from custom_events import EventAnnouncer
-from view import View
-from button import Button
+from view.view import View
+from view.button import Button
 from drawing import ImageLibrary
 from mouse import Mouse
 

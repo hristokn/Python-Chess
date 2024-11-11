@@ -1,7 +1,7 @@
 from pygame import Surface
 from pygame.font import SysFont, get_default_font
 from pygame.event import Event
-from view import View
+from view.view import View
 from time import time_ns
 from custom_events import CustomEvent, EventObserver
 

@@ -1,18 +1,18 @@
 from drawing import ImageLibrary
 from mouse import Mouse
-from screen import Screen
+from screen.screen import Screen
 from chess.chess import ChessBoard, Color
 from board_controller import BoardController
-from button import Button
-from timer import TimerBox
-from taken_pieces_display import TakenPiecesDisplay
+from view.button import Button
+from view.timer import TimerBox
+from view.taken_pieces_display import TakenPiecesDisplay
 from custom_events import EventAnnouncer
 
 
 class ChessScreen(Screen):
     def __init__(self, mouse: Mouse, image_library: ImageLibrary, event_announcer: EventAnnouncer, color: Color):
         super().__init__(mouse, image_library, event_announcer)
-        game = ChessBoard(color)
+        game = ChessBoard(Color.WHITE)
         game.start()
         self.board_controller = BoardController(game, self.image_library, color, 80, 80)
         self.board_controller.setup(self.mouse)

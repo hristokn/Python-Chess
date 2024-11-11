@@ -3,9 +3,10 @@ from pygame.event import Event
 from custom_events import CustomEvent, post_event
 from pygame import Surface
 from drawing import Drawable, get_square_pos, SQUARE_SIZE, ImageLibrary
-from chess.chess import ChessBoard, Square, Color
-from chess_controller import SquareController, PieceController
-from promotion_picker import PromotionPicker
+from chess.chess import ChessBoard, Square, Color, Piece
+from view.chess_controller import SquareController, PieceController
+from view.promotion_picker import PromotionPicker
+from chess_input import ChessInput,MouseChessInput, AIChessInput
 
 def get_square_controller(square_controllers: list[SquareController], sq: Square):
     sc = None
@@ -14,7 +15,6 @@ def get_square_controller(square_controllers: list[SquareController], sq: Square
             sc = _sc
             break
     return sc
-
 
 def get_piece_controller(piece_controllers: list[PieceController], piece):
     piece_controller = None
@@ -44,32 +44,38 @@ class BoardController(Drawable, Clickable):
         self._promotion_target = None
         self._promotion_piece = None
 
+        mouse_input = MouseChessInput(self)
+        ai_input = AIChessInput(self)
+        opponent_color = Color.BLACK if self.color == Color.WHITE else Color.WHITE
+        self.chess_inputs:dict[Color, ChessInput] = {self.color: mouse_input, opponent_color: ai_input}
+
     def setup(self, mouse: Mouse):
         self.mouse = mouse
         mouse.register_button_observer(self)
         for square, piece in self.game.board.items():
-            pos = get_square_pos(self.board_x, self.board_y, square, self.color)
-            sc = SquareController(square, self.image_library, pos[0], pos[1], 1)
-            self.square_controllers.append(sc)
-            mouse.register_button_observer(sc)
+            x,y = get_square_pos(self.board_x, self.board_y, square, self.color)
+            self.add_square(square, x, y)
             if piece != None:
-                pc = PieceController(piece, self.image_library, pos[0], pos[1], 2)
-                self.piece_controllers.append(pc)
-                mouse.register_button_observer(pc) 
-                mouse.register_motion_observer(pc)
+                self.add_piece(piece, x, y)
+
+    def add_square(self, square: Square, x, y):
+        sc = SquareController(square, self.image_library, x, y, 1)
+        self.square_controllers.append(sc)
+        self.mouse.register_button_observer(sc)
+
+    def add_piece(self, piece: Piece, x, y):
+        pc = PieceController(piece, self.image_library, x, y, 2)
+        self.piece_controllers.append(pc)
+        self.mouse.register_button_observer(pc) 
+        self.mouse.register_motion_observer(pc)
 
     def rotate(self):
         self.color = Color.WHITE if self.color == Color.BLACK else Color.BLACK
-        _square_controllers = []
         for sc in self.square_controllers:
-            self.mouse.unregister_button_observer(sc)
             square = sc.square
-            pos = get_square_pos(self.board_x, self.board_y, square, self.color)
-            _sc = SquareController(square, self.image_library, pos[0], pos[1], 1)
-            _square_controllers.append(_sc)
-            self.mouse.register_button_observer(_sc)
+            x,y = get_square_pos(self.board_x, self.board_y, square, self.color)
+            sc.move(x,y)
         
-        self.square_controllers = _square_controllers
         if self._promotion_picker != None:
             self._promotion_picker.rotate()    
 
@@ -85,30 +91,29 @@ class BoardController(Drawable, Clickable):
             self._promotion_picker.draw(surface)
 
     def update(self):
-        self.handle_clicked_pieces()
+        self.chess_inputs[self.game.color_to_play].update()
+        move = self.chess_inputs[self.game.color_to_play].get_move()
+        self.try_move(move)
         if self._promotion_picker != None:
             self._promotion_picker.update()
 
     def update_pieces(self):
-        removed = []
+        for square, piece in self.game.board.items():
+            if piece != None and not any(pc.piece == piece for pc in self.piece_controllers):
+                x,y = get_square_pos(self.board_x, self.board_y, square, self.color)
+                self.add_piece(piece, x, y)
+
+        for removed_piece in filter(lambda pc: self.game.find_square(pc.piece) == Square.UNKNOWN, self.piece_controllers):
+            self.mouse.unregister_button_observer(removed_piece)
+            self.mouse.unregister_motion_observer(removed_piece)
+
+        self.piece_controllers = list(filter(lambda pc: self.game.find_square(pc.piece) != Square.UNKNOWN,
+                                              self.piece_controllers))
         for p in self.piece_controllers:
             square = self.game.find_square(p.piece)
-            if square == Square.UNKNOWN:
-                removed.append(p)
-                continue
             x, y = get_square_pos(self.board_x, self.board_y, square, self.color)
-            p.draw_x1 = x
-            p.draw_y1 = y
-            p.x1 = x
-            p.y1 = y
-            p.x2 = x + SQUARE_SIZE
-            p.y2 = y + SQUARE_SIZE
+            p.move(x,y)
             p.update_image()
-        for p in removed:
-            self.piece_controllers.remove(p)
-            self.mouse.unregister_button_observer(p)
-            self.mouse.unregister_motion_observer(p)
-        self.piece_controllers.sort(key=lambda p: p.priority)
     
     def select_piece(self, piece: PieceController):
         self.selected_piece = piece
@@ -143,79 +148,6 @@ class BoardController(Drawable, Clickable):
         self.held_piece = None
         self.update_pieces()
 
-    def handle_clicked_pieces(self):
-        down = None
-        up = None
-        for piece in self.piece_controllers:
-            if piece.left_buttop_down:
-                down = piece
-            if piece.left_buttop_up:
-                up = piece
-
-        for square in self.square_controllers:
-            if square.left_buttop_down:
-                down = square
-            if square.left_buttop_up:
-                up = square
-
-        if down != None:
-            self.down(down)
-            down.left_buttop_down = False
-        if up != None:
-            self.up(up)
-            up.left_buttop_up = False
-
-    def down(self, obj):
-        if isinstance(obj, PieceController):
-            self.piecedown(obj)
-        if isinstance(obj, SquareController):
-            self.squaredown(obj)
-        
-    def piecedown(self, piece):
-        if self.selected_piece == None:
-            self.select_piece(piece)
-            self.set_held_piece(piece)
-        elif self.selected_piece == piece:
-            self.set_held_piece(piece)
-        else:
-            self.try_move(piece)
-            self.deselect_piece()
-
-    def squaredown(self, square):
-        if self.selected_piece != None:
-            self.try_move(square)
-            self.deselect_piece()
-
-    def up(self, obj):
-        if isinstance(obj, PieceController):
-            self.pieceup(obj)
-        if isinstance(obj, SquareController):
-            self.squareup(obj)
-
-    def outside_click(self):
-        if self.held_piece != None:
-            self.clear_held_piece()
-        if self.selected_piece != None:
-            self.deselect_piece()
-
-    def pieceup(self, piece):
-        if self.selected_piece == piece:
-            self.clear_held_piece()
-        elif self.selected_piece != None and self.held_piece != None:
-            self.try_move(piece)
-            self.deselect_piece()
-            self.clear_held_piece()
-
-    def squareup(self, square):
-        if self.selected_piece == None:
-            pass
-        elif self.held_piece == None:
-            self.deselect_piece()
-        elif self.held_piece != None:
-            self.try_move(square)
-            self.deselect_piece()
-            self.clear_held_piece()
-
     def create_promotion_picker(self, piece, square):
         x, y = get_square_pos(self.board_x, self.board_y, square, self.color)
         draw_down = (self.color == self.game.color_to_play)
@@ -228,9 +160,7 @@ class BoardController(Drawable, Clickable):
         self.mouse.register_button_observer(self._promotion_picker)
 
         pc = get_piece_controller(self.piece_controllers, piece)
-        self.piece_controllers.remove(pc)
-        self.mouse.unregister_button_observer(pc)
-        self.mouse.unregister_motion_observer(pc)
+        pc.hide()
         self._promotion_piece = piece
         self._promotion_target = square
 
@@ -257,17 +187,9 @@ class BoardController(Drawable, Clickable):
         self.update_pieces()
         post_event(CustomEvent.PLAYED_MOVE, color=_color)
 
-    def try_move(self, target):
-        if isinstance(target, PieceController):
-            target = target.piece
-            square = self.game.find_square(target)
-        else:
-            square = target.square
-
+    def try_move(self, move):
         _color=self.game.color_to_play
-        if self.game.multiple_moves_exist(self.selected_piece.piece, square):
-            self.create_promotion_picker(self.selected_piece.piece, square)
-        elif self.game.play_move(self.game.find_move(self.selected_piece.piece, square)):
+        if self.game.play_move(move):
             self.update_pieces()
             post_event(CustomEvent.PLAYED_MOVE, color=_color)
 
@@ -279,6 +201,8 @@ class BoardController(Drawable, Clickable):
             return True
         return False
 
-    def recieve_mouse_motion(self, event: Event):
-        return super().recieve_mouse_motion(event)
-    
+    def outside_click(self):
+        if self.held_piece != None:
+            self.clear_held_piece()
+        if self.selected_piece != None:
+            self.deselect_piece()

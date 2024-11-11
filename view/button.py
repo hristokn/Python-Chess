@@ -1,4 +1,4 @@
-from view import View
+from view.view import View
 from pygame import Surface
 from pygame.event import Event
 from pygame.font import SysFont, get_default_font

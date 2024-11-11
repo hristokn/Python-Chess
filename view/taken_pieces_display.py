@@ -1,4 +1,4 @@
-from view import View
+from view.view import View
 from pygame import Surface
 from pygame.event import Event
 from chess.chess import ChessBoard

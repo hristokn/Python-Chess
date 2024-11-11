@@ -1,4 +1,4 @@
-from view import View
+from view.view import View
 from drawing import ImageLibrary, get_piece_image_name, get_square_image, SQUARE_SIZE
 from pygame import Surface
 from pygame.event import Event
@@ -40,20 +40,27 @@ class PieceController(View):
         self.is_held = False
         self.can_be_taken = False
         self._default_priority = priority
+        self.hidden = False
 
     def recieve_click(self, event: Event) -> bool:
+        if self.hidden:
+            return
         super().recieve_click(event)
         x,y = event.pos
         if self.collides(x,y):
             return True
 
     def recieve_mouse_motion(self, event: Event):
+        if self.hidden:
+            return
         x,y = event.pos
         if self.is_held:
             self.draw_x1 = x - SQUARE_SIZE/2
             self.draw_y1 = y - SQUARE_SIZE/2
 
     def draw(self, surface: Surface):
+        if self.hidden:
+            return
         super().draw(surface)
         if self.can_be_taken:
             surface.blit(self.image_library[self.take_image], (self.draw_x1,self.draw_y1))
@@ -70,3 +77,9 @@ class PieceController(View):
         
     def update_image(self):
         self.image = get_piece_image_name(self.piece.color, self.piece.type)
+
+    def hide(self):
+        self.hidden = True
+
+    def show(self):
+        self.hidden = False

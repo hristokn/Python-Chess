@@ -13,10 +13,9 @@ class ChessBoard:
         self.color_to_play = color
 
 
-    def checkmate(self):
-        for sq, piece in self.board.items():
-            self.board[sq] = None
-
+    def in_checkmate(self):
+        return len(self.possible_moves) == 0
+        
     def calc_possible_moves(self, color: Color):
         self.possible_moves = []
         for sq, piece in self.board.items():
@@ -24,9 +23,6 @@ class ChessBoard:
                 self.possible_moves.extend(piece.get_moves(sq, self.past_moves, self.board))
 
         self.possible_moves = list(filter(self.is_safe_move, self.possible_moves))
-
-        if len(self.possible_moves) == 0:
-            self.checkmate()
 
     def is_safe_move(self, move):
         past_moves = self.past_moves.copy()
@@ -95,7 +91,6 @@ class ChessBoard:
     def prepare_turn(self):
         self.color_to_play = self.next_color()
         self.calc_possible_moves(self.color_to_play)
-
 
     def turn(self, move: Move):
         self.play_move(move)

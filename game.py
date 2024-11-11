@@ -5,9 +5,9 @@ from chess.chess import ChessBoard
 from chess.enums import Color
 from drawing import ImageLibrary, IMAGES
 from custom_events import EventAnnouncer
-from main_menu import MainMenu 
-from chess_screen import ChessScreen 
-from screen import Screen 
+from screen.main_menu import MainMenu 
+from screen.chess_screen import ChessScreen 
+from screen.screen import Screen 
 
 class Game:
     def __init__(self, width: int, height: int, framerate: int = 30):
