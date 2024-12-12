@@ -7,8 +7,7 @@ from chess.enums import PieceType, Color
 
 class PromotionPicker(View):
     def __init__(self, board_x, board_y, x1, y1, priority, img_lib: ImageLibrary, color: Color, draw_down, click_function):
-        self.background = Surface((SQUARE_SIZE, SQUARE_SIZE*4))
-        self.background.fill('grey')
+        self.background = 'promotion_picker_background'
         super().__init__(x1, y1, priority, img_lib, '')
         self.x2 = x1 + SQUARE_SIZE
         self.y2 = y1 + SQUARE_SIZE * 4
@@ -20,11 +19,11 @@ class PromotionPicker(View):
                         get_piece_image_name(color, PieceType.ROOK),
                         click_function, PieceType.ROOK),
         PromotionButton(x1, y1 + SQUARE_SIZE * 2, 5, img_lib,
-                        get_piece_image_name(color, PieceType.KNIGHT),
-                        click_function, PieceType.KNIGHT),
-        PromotionButton(x1, y1 + SQUARE_SIZE * 3, 5, img_lib,
                         get_piece_image_name(color, PieceType.BISHOP),
-                        click_function, PieceType.BISHOP)]
+                        click_function, PieceType.BISHOP),
+        PromotionButton(x1, y1 + SQUARE_SIZE * 3, 5, img_lib,
+                        get_piece_image_name(color, PieceType.KNIGHT),
+                        click_function, PieceType.KNIGHT)]
 
         self._board_x = board_x
         self._board_y = board_y
@@ -44,12 +43,8 @@ class PromotionPicker(View):
         half_chess_board = SQUARE_SIZE * 4
         if self._draw_down:
             half_chess_board = half_chess_board * -1
-        self.y1 += half_chess_board
-        self.y2 += half_chess_board
-        self.draw_y1 += half_chess_board
-        self.x1 = picker_start
-        self.x2 = picker_start
-        self.draw_x1 = picker_start
+
+        self.move(picker_start, self.y1 + half_chess_board)
         
         self.align_buttons()
         if self._draw_down:
@@ -90,7 +85,7 @@ class PromotionPicker(View):
             button.update()
     
     def draw(self, surface: Surface):
-        surface.blit(self.background, (self.draw_x1, self.draw_y1))
+        surface.blit(self.image_library[self.background], (self.draw_x1, self.draw_y1))
         for button in self._buttons:
             button.draw(surface)
     

@@ -14,7 +14,7 @@ class ChessScreen(Screen):
         super().__init__(mouse, image_library, event_announcer)
         game = ChessBoard(Color.WHITE)
         game.start()
-        self.board_controller = BoardController(game, self.image_library, color, 80, 80)
+        self.board_controller = BoardController(self.image_library, color, 80, 80)
         self.board_controller.setup(self.mouse)
         self.add_element(self.board_controller)
         

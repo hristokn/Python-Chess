@@ -43,6 +43,7 @@ IMAGES = {
         'text_button_pressed': 'images/text_button_pressed.png',
         'button_black': 'images/button_black.png',
         'button_white': 'images/button_white.png',
+        'promotion_picker_background': 'images/promotion_picker_background.png',
         }
 
 class ImageLibrary:

@@ -31,6 +31,15 @@ class MainMenu(Screen):
         self.add_element(self.color_button)
         self.mouse.register_button_observer(self.color_button)
 
+        self.start_practive_button = TextButton(500, 450, 1, self.image_library, 'Practice', self.start_practice_game)
+        self.add_element(self.start_game_button)
+        self.mouse.register_button_observer(self.start_game_button)
+
     def start_chess_game(self):
         chess = ChessScreen(self.mouse, self.image_library, self.event_announcer, self.color_button.get_value())
         self.change_screen(chess)
+    
+    def start_practice_game(self):
+        chess = ChessScreen(self.mouse, self.image_library, self.event_announcer, self.color_button.get_value())
+        self.change_screen(chess)
+    
