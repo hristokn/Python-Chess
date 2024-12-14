@@ -28,3 +28,10 @@ class PieceType(Enum):
 class Color(Enum):
     WHITE = 0
     BLACK = 1
+
+    def next(self):
+        if self == Color.WHITE:
+            return Color.BLACK
+        elif self == Color.BLACK:
+            return Color.WHITE
+        
