@@ -86,8 +86,14 @@ class BoardController(View, EventObserver):
         Drawable.draw(self, surface)
         for sq in self.square_controllers:
             sq.draw(surface)
+      
         for p in self.piece_controllers:
             p.draw(surface)
+        try:    
+            self.held_piece.draw(surface)
+        except AttributeError:
+            pass
+       
         if self._promotion_picker != None:
             self._promotion_picker.draw(surface)
 
