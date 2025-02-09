@@ -4,4 +4,7 @@ from random import randint
 
 
 def pick_move(chess_board: ChessBoard):
-    return chess_board.possible_moves[randint(0, len(chess_board.possible_moves)-1)]
+    moves_count = len(chess_board.possible_moves)
+    if moves_count == 0:
+        return None
+    return chess_board.possible_moves[randint(0, moves_count-1)]

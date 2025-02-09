@@ -51,6 +51,15 @@ class Clickable:
         self.y1 = y
         self.y2 = y + height
 
+    def resize(self, width, height):
+        self.x2 = self.x1 + width
+        self.y2 = self.y1 + height
+
+    def width(self):
+        return self.x2-self.x1
+
+    def height(self):
+        return self.y2-self.y1
 
 class Mouse(EventObserver):
     def __init__(self) -> None:

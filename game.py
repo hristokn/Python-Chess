@@ -1,4 +1,5 @@
 import pygame
+from custom_events import CustomEvent, post_event
 from board_controller import BoardController
 from mouse import Mouse
 from chess.chess import ChessBoard
@@ -38,6 +39,8 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            elif event.type == CustomEvent.CHANGE_SCREEN.value:
+                self.open_screen(event)
             else:
                 self.event_announcer.announce_event(event)
 
@@ -65,15 +68,25 @@ class Game:
     def remove_object(self, obj):
         self.objects.remove(obj)
 
-    def handle_click(self, click: pygame.event):
+    def handle_click(self, click: pygame.event.Event):
         self.mouse.process_mouse_event(click)
 
-    def open_screen(self, screen: Screen):
+    def open_screen(self, event: pygame.event.Event):
+        screen_name = event.screen_name
+        new_screen = None
+        match(screen_name):
+            case 'main_menu':
+                new_screen = MainMenu(self.mouse, self.image_library, self.event_announcer)
+            case 'chess_game':
+                new_screen = ChessScreen(self.mouse, self.image_library, self.event_announcer, event.color)
+            case 'practice_game':
+                pass   
+
         if self.screen != None:
-            self.screen.free_elements()
+            self.screen.destroy()
             self.remove_object(self.screen)
-        self.screen = screen
-        self.add_object(screen)
+        self.screen = new_screen
+        self.add_object(new_screen)
 
 
 class ChessGame(Game):
@@ -84,9 +97,7 @@ class ChessGame(Game):
         self.color = Color.WHITE
 
     def run(self):
-        main_menu = MainMenu(self.mouse, self.image_library, self.event_announcer, self.open_screen)
-
-        self.open_screen(main_menu)
+        post_event(CustomEvent.CHANGE_SCREEN, screen_name='main_menu')
         super().run()
 
     def _get_images(self):

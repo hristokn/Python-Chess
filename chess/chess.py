@@ -45,7 +45,8 @@ class ChessBoard:
         self.color_to_play = first_color
 
     def king_in_check(self, color: Color):
-        other_colors = list(Color).remove(color)
+        other_colors = list(Color)
+        other_colors.remove(color)
         for color in other_colors:
             possible_moves = self.get_possible_moves(color)
             for move in possible_moves:
@@ -58,7 +59,7 @@ class ChessBoard:
         return len(self.possible_moves) == 0 and self.king_in_check(self.color_to_play)
 
     def in_draw(self):
-        len(self.possible_moves) == 0 and not self.in_checkmate()
+        return len(self.possible_moves) == 0 and not self.in_checkmate()
 
     def get_possible_moves(self, color: Color) -> list[Move]:
         possible_moves = []

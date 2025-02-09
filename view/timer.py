@@ -25,8 +25,9 @@ class TimerBox(View, EventObserver):
             self.finish_timer()
 
     def finish_timer(self):
+        if self._timer.running():
+            post_event(CustomEvent.TIMER_END, color = self._color)
         self._timer.pause_timer()
-        post_event(CustomEvent.TIMER_END, color = self._color)
 
     def recieve_click(self, event: Event) -> bool:
         return False

@@ -4,6 +4,7 @@ from custom_events import CustomEvent, post_event, EventObserver
 from pygame import Surface
 from drawing import Drawable, get_square_pos, SQUARE_SIZE, ImageLibrary
 from chess.chess import ChessBoard, Square, Color, Piece
+from chess.finished_game import FinishedGame, VictoryType
 from view.view import View
 from view.chess_controller import SquareController, PieceController
 from view.promotion_picker import PromotionPicker
@@ -26,15 +27,6 @@ def get_piece_controller(piece_controllers: list[PieceController], piece):
     return piece_controller
 
 class BoardController(View, EventObserver):
-    _promotion_picker: PromotionPicker = None
-    _promotion_target = None
-    _promotion_piece = None
-    piece_controllers: list[PieceController] = []
-    square_controllers: list[SquareController] = []
-    selected_piece = None
-    held_piece = None
-    game_ended = False
-
     def __init__(self, image_library: ImageLibrary,
                  color, x, y):
         board_background = Surface((8 * SQUARE_SIZE, 8 * SQUARE_SIZE))
@@ -45,6 +37,14 @@ class BoardController(View, EventObserver):
         self.x = x
         self.y = y
 
+        self._promotion_picker: PromotionPicker = None
+        self._promotion_target = None
+        self._promotion_piece = None
+        self.piece_controllers: list[PieceController] = []
+        self.square_controllers: list[SquareController] = []
+        self.selected_piece = None
+        self.held_piece = None
+        self.game_ended = False
         mouse_input = MouseChessInput(self)
         ai_input = AIChessInput(self)
         opponent_color = Color.BLACK if self.color == Color.WHITE else Color.WHITE
@@ -98,6 +98,8 @@ class BoardController(View, EventObserver):
             self._promotion_picker.draw(surface)
 
     def update(self):
+        if self.game_ended:
+            pass
         self.chess_inputs[self.game.color_to_play].update()
         move = self.chess_inputs[self.game.color_to_play].get_move()
         self.try_move(move)
@@ -199,9 +201,7 @@ class BoardController(View, EventObserver):
         if self.game.play_move(move):
             self.update_pieces()
             post_event(CustomEvent.PLAYED_MOVE, color=_color)
-
-    def game_ended(self):
-        return self.game.in_checkmate()
+            self.try_finish_game()
 
     def recieve_click(self, event: Event) -> bool:
         x,y = event.pos
@@ -214,9 +214,32 @@ class BoardController(View, EventObserver):
     def outside_click(self):
         if self.held_piece != None:
             self.clear_held_piece()
-        if self.selected_piece != None:
+        if self.selected_piece != None: 
             self.deselect_piece()
     
     def receive_event(self, event):
         if event.type == CustomEvent.TIMER_END.value:
+            self.game_ended = True
+            color = event.color.next()
+            self.finished_game = FinishedGame(self.game, color, VictoryType.TIMEOUT)
+
+    def try_finish_game(self):
+        if self.game_ended:
             pass
+        elif self.game.in_draw():
+            self.game_ended = True
+            self.finished_game = FinishedGame(self.game, None, VictoryType.DRAW)
+        elif self.game.in_checkmate():
+            self.game_ended = True
+            color = self.game.color_to_play.next()
+            self.finished_game = FinishedGame(self.game, color, VictoryType.CHECKMATE)
+
+
+    def destroy(self):
+        for pc in self.piece_controllers:
+            self.mouse.unregister_button_observer(pc)
+            self.mouse.unregister_motion_observer(pc)
+        for sq in self.square_controllers:
+            self.mouse.unregister_button_observer(sq)
+        self.mouse.unregister_button_observer(self._promotion_picker)
+        return super().destroy()

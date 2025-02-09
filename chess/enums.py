@@ -1,6 +1,12 @@
 from enum import Enum
 
-class PieceType(Enum):
+class ExtendedEnum(Enum):
+
+    @classmethod
+    def list(cls):
+        return [e for e in cls]
+
+class PieceType(ExtendedEnum):
     PAWN = 0
     KNIGHT = 1
     BISHOP = 2
@@ -25,7 +31,7 @@ class PieceType(Enum):
             case _:
                 raise NotImplementedError
 
-class Color(Enum):
+class Color(ExtendedEnum):
     WHITE = 0
     BLACK = 1
 

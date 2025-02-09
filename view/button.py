@@ -1,7 +1,7 @@
 from view.view import View
+from view.text import Text
 from pygame import Surface
 from pygame.event import Event
-from pygame.font import SysFont, get_default_font
 
 class Button(View):
     def __init__(self, x1, y1, priority, img_lib, button_img,
@@ -57,23 +57,17 @@ class Button(View):
     
 
 class TextButton(Button):
-    def __init__(self, x1, y1, priority, img_lib, text, click_function):
-        super().__init__(x1, y1, priority, img_lib, 'text_button', 'text_button_pressed', click_function)
-        self.text = text
-        self.font = SysFont(get_default_font(), 40)
-        self.prepare_text()
+    def __init__(self, x1, y1, priority, img_lib, text, click_function, button_img = 'text_button', pressed_button_img = 'text_button_pressed'):
+        super().__init__(x1, y1, priority, img_lib, button_img, pressed_button_img, click_function)
+        self.text: Text = Text(self.x1, self.y1, self.x2, self.y2, priority, self.image_library, text)
 
     def draw(self, surface: Surface):
         super().draw(surface)
-        self.image_library[self.image].blit(self.font_img, (self.text_x, self.text_y))
+        self.text.draw(surface)
 
-    def prepare_text(self):
-        self.text_width, self.text_height = self.font.size(self.text)
-        self.button_width, self.button_height = self.image_library[self.image].get_size()
-        self.text_x = (self.button_width - self.text_width)/2
-        self.text_y = (self.button_height - self.text_height)/2
-        self.font_img = self.font.render(self.text, 0, 'black')
-
+class SmallTextButton(TextButton):
+    def __init__(self, x1, y1, priority, img_lib, text, click_function):
+        super().__init__(x1, y1, priority, img_lib, text, click_function, 'text_button_small', 'text_button_pressed_small')
 
 class SwitchButton(Button):
     def __init__(self, x1, y1, priority, img_lib, button_images:list[str], button_values:list):

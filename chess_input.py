@@ -10,7 +10,7 @@ class ChessInput(ABC):
         self.board_controller = board_controller
 
     @abstractmethod
-    def get_move(self) -> Move:
+    def get_move(self) -> Move | None:
         pass
 
     def update(self):
@@ -21,7 +21,7 @@ class MouseChessInput(ChessInput):
         super().__init__(board_controller)
         self.move = None
 
-    def get_move(self) -> Move:
+    def get_move(self) -> Move | None:
         if self.move == None:
             self.waiting_for_move = True
             return None
@@ -119,7 +119,7 @@ class MouseChessInput(ChessInput):
             self.move = self.board_controller.game.find_move(selected_piece, square)
 
 class AIChessInput(ChessInput):
-    def get_move(self) -> Move:
+    def get_move(self) -> Move | None:
         return pick_move(self.board_controller.game)
 
 class NetworkChessInput(ChessInput):
