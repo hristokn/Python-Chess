@@ -39,6 +39,7 @@ class ChessBoard:
     def __init__(self, first_color: Color, board_setup: Callable[[dict[Square, None|Piece]], None] = standard_board):
         self.board = {Square(square):None for square in range(64)}
         board_setup(self.board)
+        self.board_starting_state = self.board.copy()
         self.past_moves: list[Move] = []
         self.possible_moves: list[Move] = []
         self.taken_pieces: list[Piece] = []
@@ -48,7 +49,7 @@ class ChessBoard:
         other_colors = list(Color)
         other_colors.remove(color)
         for color in other_colors:
-            possible_moves = self.get_possible_moves(color)
+            possible_moves = self.get_possible_moves_without_king(color)
             for move in possible_moves:
                 is_king = lambda piece: piece.type == PieceType.KING and piece.color == color
                 if len(list(filter(is_king, move.taken))) != 0:
@@ -61,14 +62,25 @@ class ChessBoard:
     def in_draw(self):
         return len(self.possible_moves) == 0 and not self.in_checkmate()
 
-    def get_possible_moves(self, color: Color) -> list[Move]:
+    def get_possible_moves_without_king(self, color: Color) -> list[Move]:
         possible_moves = []
         for sq, piece in self.board.items():
-            if piece != None and piece.color == color:
+            if piece != None and piece.color == color and piece.type != PieceType.KING:
                 possible_moves.extend(piece.get_moves(sq, self.past_moves, self.board))
 
-        possible_moves = list(filter(self.is_safe_move, possible_moves))
+        possible_moves = [move for move in possible_moves if self.is_safe_move(move)]
         return possible_moves
+
+    def get_possible_moves(self, color: Color) -> list[Move]:
+        possible_moves = self.get_possible_moves_without_king(color)
+        king_moves = [piece.get_moves(square, self.past_moves, self.board) for square, piece in self.board.items() if piece != None and piece.color == color and piece.type == PieceType.KING]
+        for king_move in king_moves:
+            king_move = [move for move in king_move if self.is_safe_move(move)]
+            possible_moves.extend(king_move)
+        if self.king_in_check(color):
+            possible_moves = [move for move in possible_moves if not (hasattr(move, 'is_castle') and move.is_castle)]
+        return possible_moves
+    
     
     def update_possible_moves(self, color: Color) -> None:
         self.possible_moves = self.get_possible_moves(color)
@@ -144,6 +156,23 @@ class ChessBoard:
         self.play_move(move)
         self.prepare_turn()
 
+    def undo_last_move(self):
+        if len(self.past_moves) == 0:
+            return
+        last_move = self.past_moves.pop()
+        for taken in last_move.taken:
+            self.taken_pieces.remove(taken)
+
+        board_states = [self.board_starting_state]
+        board_states.extend([move.changes for move in self.past_moves])
+        for changed_sq in last_move.changes.keys():
+            for changes in reversed(board_states):
+                if changed_sq in changes:
+                    self.board[changed_sq] = changes[changed_sq]
+                    break        
+        
+        self.color_to_play = self.color_to_play.previous()
+        self.update_possible_moves(self.color_to_play)
 
 
 

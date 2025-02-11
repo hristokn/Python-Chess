@@ -41,3 +41,8 @@ class Color(ExtendedEnum):
         elif self == Color.BLACK:
             return Color.WHITE
         
+    def previous(self):
+        if self == Color.WHITE:
+            return Color.BLACK
+        elif self == Color.BLACK:
+            return Color.WHITE

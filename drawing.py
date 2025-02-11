@@ -47,6 +47,8 @@ IMAGES = {
         'button_white': 'images/button_white.png',
         'promotion_picker_background': 'images/promotion_picker_background.png',
         'popup': 'images/popup.png',
+        'button_rewind': 'images/button_rewind.png',
+        'button_rewind_pressed': 'images/button_rewind_pressed.png',
         }
 
 class ImageLibrary:

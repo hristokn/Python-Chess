@@ -40,9 +40,9 @@ class TimerBox(View, EventObserver):
                     self._started = True
                 return 
 
-            if self._timer.running():
+            if self._timer.running() and event.color == self._color:
                 self._timer.pause_timer()
-            else:
+            if not self._timer.running() and event.color.next() == self._color:
                 self._timer.start_timer()
 
 

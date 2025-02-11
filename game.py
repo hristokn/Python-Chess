@@ -2,12 +2,12 @@ import pygame
 from custom_events import CustomEvent, post_event
 from board_controller import BoardController
 from mouse import Mouse
-from chess.chess import ChessBoard
 from chess.enums import Color
 from drawing import ImageLibrary, IMAGES
 from custom_events import EventAnnouncer
 from screen.main_menu import MainMenu 
 from screen.chess_screen import ChessScreen 
+from screen.practice_chess_screen import PracticeChessScreen 
 from screen.screen import Screen 
 
 class Game:
@@ -80,7 +80,7 @@ class Game:
             case 'chess_game':
                 new_screen = ChessScreen(self.mouse, self.image_library, self.event_announcer, event.color)
             case 'practice_game':
-                pass   
+                new_screen = PracticeChessScreen(self.mouse, self.image_library, self.event_announcer, event.color)
 
         if self.screen != None:
             self.screen.destroy()

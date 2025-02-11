@@ -28,12 +28,13 @@ def get_piece_controller(piece_controllers: list[PieceController], piece):
 
 class BoardController(View, EventObserver):
     def __init__(self, image_library: ImageLibrary,
-                 color, x, y):
+                 color, x, y, opponent_input: str):
         board_background = Surface((8 * SQUARE_SIZE, 8 * SQUARE_SIZE))
         View.__init__(self, x, y, 10, image_library, board_background)
         self.game = ChessBoard(color)
         self.game.start()
-        self.color = color
+        self.color_pov = color
+        self.player_color = color
         self.x = x
         self.y = y
 
@@ -45,16 +46,22 @@ class BoardController(View, EventObserver):
         self.selected_piece = None
         self.held_piece = None
         self.game_ended = False
-        mouse_input = MouseChessInput(self)
-        ai_input = AIChessInput(self)
-        opponent_color = Color.BLACK if self.color == Color.WHITE else Color.WHITE
-        self.chess_inputs:dict[Color, ChessInput] = {self.color: mouse_input, opponent_color: ai_input}
+        
+        if opponent_input == 'ai':
+            input = AIChessInput(self)
+        elif opponent_input == 'mouse':
+            input = MouseChessInput(self)
+        else:
+            raise ValueError
+
+        opponent_color = self.player_color.next()
+        self.chess_inputs:dict[Color, ChessInput] = {self.player_color: MouseChessInput(self), opponent_color: input}
 
     def setup(self, mouse: Mouse):
         self.mouse = mouse
         mouse.register_button_observer(self)
         for square, piece in self.game.board.items():
-            x,y = get_square_pos(self.x, self.y, square, self.color)
+            x,y = get_square_pos(self.x, self.y, square, self.color_pov)
             self.add_square(square, x, y)
             if piece != None:
                 self.add_piece(piece, x, y)
@@ -71,10 +78,10 @@ class BoardController(View, EventObserver):
         self.mouse.register_motion_observer(pc)
 
     def rotate(self):
-        self.color = Color.WHITE if self.color == Color.BLACK else Color.BLACK
+        self.color_pov = self.color_pov.next()
         for sc in self.square_controllers:
             square = sc.square
-            x,y = get_square_pos(self.x, self.y, square, self.color)
+            x,y = get_square_pos(self.x, self.y, square, self.color_pov)
             sc.move(x,y)
         
         if self._promotion_picker != None:
@@ -109,7 +116,7 @@ class BoardController(View, EventObserver):
     def update_pieces(self):
         for square, piece in self.game.board.items():
             if piece != None and not any(pc.piece == piece for pc in self.piece_controllers):
-                x,y = get_square_pos(self.x, self.y, square, self.color)
+                x,y = get_square_pos(self.x, self.y, square, self.color_pov)
                 self.add_piece(piece, x, y)
 
         for removed_piece in filter(lambda pc: self.game.find_square(pc.piece) == Square.UNKNOWN, self.piece_controllers):
@@ -120,7 +127,7 @@ class BoardController(View, EventObserver):
                                               self.piece_controllers))
         for p in self.piece_controllers:
             square = self.game.find_square(p.piece)
-            x, y = get_square_pos(self.x, self.y, square, self.color)
+            x, y = get_square_pos(self.x, self.y, square, self.color_pov)
             p.move(x,y)
             p.update_image()
     
@@ -158,8 +165,8 @@ class BoardController(View, EventObserver):
         self.update_pieces()
 
     def create_promotion_picker(self, piece, square):
-        x, y = get_square_pos(self.x, self.y, square, self.color)
-        draw_down = (self.color == self.game.color_to_play)
+        x, y = get_square_pos(self.x, self.y, square, self.color_pov)
+        draw_down = (self.color_pov == self.game.color_to_play)
         if not draw_down:
             y -= SQUARE_SIZE*3
 
@@ -186,7 +193,7 @@ class BoardController(View, EventObserver):
         if not self.game.play_move(self.game.get_promotion_move(self._promotion_piece, self._promotion_target, piece_type)):
             raise RuntimeError
         
-        x,y = get_square_pos(self.x, self.y, self._promotion_target, self.color)
+        x,y = get_square_pos(self.x, self.y, self._promotion_target, self.color_pov)
         pc = PieceController(self.game.board[self._promotion_target], self.image_library, x, y, 2)
         self.piece_controllers.append(pc)
         self.mouse.register_button_observer(pc) 
@@ -234,6 +241,10 @@ class BoardController(View, EventObserver):
             color = self.game.color_to_play.next()
             self.finished_game = FinishedGame(self.game, color, VictoryType.CHECKMATE)
 
+    def rewind(self):
+        self.game.undo_last_move()
+        self.update_pieces()
+        self.try_finish_game()
 
     def destroy(self):
         for pc in self.piece_controllers:

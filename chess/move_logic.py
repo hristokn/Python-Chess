@@ -113,6 +113,7 @@ def castle(square: Square, board: dict[Square: Piece], prev_moves: list[Move], d
     if rook != None and not has_moved_before(rook, prev_moves):
         move.changes[rook_square] = None
         move.changes[sq1] = rook
+        move.is_castle = True
         moves.append(move)
 
     return moves
@@ -177,7 +178,6 @@ def king_move_logic(square: Square, board: dict[Square: Piece], prev_moves: list
     moves.extend(one_step_attack(square, board, orientaion.downleft))
     moves.extend(one_step_attack(square, board, orientaion.downright))
 
-    #TODO check if king is in check
     moves.extend(castle(square, board, prev_moves, orientaion.left))
     moves.extend(castle(square, board, prev_moves, orientaion.right))
 
