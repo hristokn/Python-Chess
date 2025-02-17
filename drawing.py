@@ -49,6 +49,8 @@ IMAGES = {
         'popup': 'images/popup.png',
         'button_rewind': 'images/button_rewind.png',
         'button_rewind_pressed': 'images/button_rewind_pressed.png',
+        'menu_button': 'images/menu_button.png',
+        'menu_button_pressed': 'images/menu_button_pressed.png',
         }
 
 class ImageLibrary:

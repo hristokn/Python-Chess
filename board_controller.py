@@ -31,7 +31,7 @@ class BoardController(View, EventObserver):
                  color, x, y, opponent_input: str):
         board_background = Surface((8 * SQUARE_SIZE, 8 * SQUARE_SIZE))
         View.__init__(self, x, y, 10, image_library, board_background)
-        self.game = ChessBoard(color)
+        self.game = ChessBoard(Color.WHITE)
         self.game.start()
         self.color_pov = color
         self.player_color = color
@@ -189,26 +189,23 @@ class BoardController(View, EventObserver):
         self._promotion_target = None
 
     def pick_promotion(self, piece_type):
-        _color=self.game.color_to_play
-        if not self.game.play_move(self.game.get_promotion_move(self._promotion_piece, self._promotion_target, piece_type)):
+        move = self.game.get_promotion_move(self._promotion_piece, self._promotion_target, piece_type)
+        if not self.try_move(move):
             raise RuntimeError
         
         x,y = get_square_pos(self.x, self.y, self._promotion_target, self.color_pov)
-        pc = PieceController(self.game.board[self._promotion_target], self.image_library, x, y, 2)
-        self.piece_controllers.append(pc)
-        self.mouse.register_button_observer(pc) 
-        self.mouse.register_motion_observer(pc)
+        self.add_piece(self.game.board[self._promotion_target], x, y)
 
         self.remove_promotion_picker()
-        self.update_pieces()
-        post_event(CustomEvent.PLAYED_MOVE, color=_color)
 
-    def try_move(self, move):
+    def try_move(self, move) -> bool:
         _color=self.game.color_to_play
-        if self.game.play_move(move):
+        played = self.game.play_move(move)
+        if played:
             self.update_pieces()
             post_event(CustomEvent.PLAYED_MOVE, color=_color)
             self.try_finish_game()
+        return played
 
     def recieve_click(self, event: Event) -> bool:
         x,y = event.pos
@@ -241,10 +238,10 @@ class BoardController(View, EventObserver):
             color = self.game.color_to_play.next()
             self.finished_game = FinishedGame(self.game, color, VictoryType.CHECKMATE)
 
-    def rewind(self):
+    def undo_move(self):
         self.game.undo_last_move()
         self.update_pieces()
-        self.try_finish_game()
+        post_event(CustomEvent.UNDID_MOVE)
 
     def destroy(self):
         for pc in self.piece_controllers:

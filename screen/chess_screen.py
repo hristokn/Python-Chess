@@ -19,10 +19,13 @@ class ChessScreen(Screen):
         self.add_element(self.board_controller)
         self.game = self.board_controller.game
         
-        self.rotate_button = Button(0, 0, 1, self.image_library, 'button_rotate', 'button_rotate_pressed', self.rotate)
+        self.rotate_button = Button(0, 50, 1, self.image_library, 'button_rotate', 'button_rotate_pressed', self.rotate)
         self.add_element(self.rotate_button)
         self.mouse.register_button_observer(self.rotate_button)
         
+        self.menu_button = Button(0, 0, 1, self.image_library, 'menu_button', 'menu_button_pressed', self.go_to_main_menu)
+        self.add_element(self.menu_button)
+        self.mouse.register_button_observer(self.menu_button)
 
         taken_pieces_display_x = 20
         taken_pieces_display_upper_y = 20

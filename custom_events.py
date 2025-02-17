@@ -10,6 +10,7 @@ class CustomEvent(AutoEvent):
     PLAYED_MOVE = auto()
     TIMER_END = auto()
     CHANGE_SCREEN = auto()
+    UNDID_MOVE = auto()
 
 def post_event(event: CustomEvent, **kwargs):
     event = Event(event.value)

@@ -48,5 +48,5 @@ class TakenPiecesDisplay(View, EventObserver):
 
 
     def receive_event(self, event):
-        if event.type == CustomEvent.PLAYED_MOVE.value:
+        if event.type == CustomEvent.PLAYED_MOVE.value or event.type == CustomEvent.UNDID_MOVE.value:
             self.update_display()

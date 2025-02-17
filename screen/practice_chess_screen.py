@@ -16,13 +16,18 @@ class PracticeChessScreen(Screen):
         self.event_announcer.register_observer(self.board_controller)
         self.add_element(self.board_controller)
 
-        self.undo_button = Button(0, 50, 3, image_library, 'button_rewind', 'button_rewind_pressed', self.undo_last_move)
+        self.undo_button = Button(0, 100, 3, image_library, 'button_rewind', 'button_rewind_pressed', self.undo_last_move)
         self.add_element(self.undo_button)
         self.mouse.register_button_observer(self.undo_button)
 
-        self.rotate_button = Button(0, 0, 1, self.image_library, 'button_rotate', 'button_rotate_pressed', self.rotate)
+        self.rotate_button = Button(0, 50, 1, self.image_library, 'button_rotate', 'button_rotate_pressed', self.rotate)
         self.add_element(self.rotate_button)
         self.mouse.register_button_observer(self.rotate_button)
+
+        self.menu_button = Button(0, 0, 1, self.image_library, 'menu_button', 'menu_button_pressed', self.go_to_main_menu)
+        self.add_element(self.menu_button)
+        self.mouse.register_button_observer(self.menu_button)
+
 
         taken_pieces_display_x = 20
         taken_pieces_display_upper_y = 20
@@ -75,4 +80,4 @@ class PracticeChessScreen(Screen):
         post_event(CustomEvent.CHANGE_SCREEN, screen_name='main_menu')
         
     def undo_last_move(self):
-        self.board_controller.rewind()
+        self.board_controller.undo_move()

@@ -92,7 +92,7 @@ class ChessBoard:
         for sq, piece in move.changes.items():
             new_board[sq] = piece
 
-        color = self.color_to_play.next()
+        color = move.piece.color.next()
         possible_moves = []
         for sq, piece in new_board.items():
             if piece != None and piece.color == color:
