@@ -114,12 +114,14 @@ class ChessBoard:
         return Square.UNKNOWN
     
     def find_move(self, start: Piece, end: Square):
-        move = None
-        for m in self.possible_moves:
-            if m.described_by(start, end):
-                move = m
-                break
-        return move
+        moves = [move for move in self.possible_moves if move.described_by(start, end)]
+        if len(moves) == 0:
+            return None
+        elif len(moves) == 1:
+            return moves[0]
+        else:
+            moves = [move for move in moves if move.changes[move.get_end_square()].type == PieceType.QUEEN]
+            moves.pop()
 
     def multiple_moves_exist(self, start: Piece, end: Square):
         found_one = False

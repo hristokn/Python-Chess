@@ -47,15 +47,16 @@ class BoardController(View, EventObserver):
         self.held_piece = None
         self.game_ended = False
         
+        player_input = MouseChessInput(self)
         if opponent_input == 'ai':
             input = AIChessInput(self)
         elif opponent_input == 'mouse':
-            input = MouseChessInput(self)
+            input = player_input
         else:
             raise ValueError
 
         opponent_color = self.player_color.next()
-        self.chess_inputs:dict[Color, ChessInput] = {self.player_color: MouseChessInput(self), opponent_color: input}
+        self.chess_inputs:dict[Color, ChessInput] = {self.player_color: player_input, opponent_color: input}
 
     def setup(self, mouse: Mouse):
         self.mouse = mouse
@@ -107,7 +108,8 @@ class BoardController(View, EventObserver):
     def update(self):
         if self.game_ended:
             pass
-        self.chess_inputs[self.game.color_to_play].update()
+        for input in self.chess_inputs.values():
+            input.update()
         move = self.chess_inputs[self.game.color_to_play].get_move()
         self.try_move(move)
         if self._promotion_picker != None:
@@ -131,11 +133,17 @@ class BoardController(View, EventObserver):
             p.move(x,y)
             p.update_image()
     
-    def select_piece(self, piece: PieceController):
-        self.selected_piece = piece
-        square = self.game.find_square(piece.piece)
+    def highlight_square(self, square: Square):
         sc = get_square_controller(self.square_controllers, square)
         sc.selected = True
+
+    def unhighlight_square(self, square: Square):
+        sc = get_square_controller(self.square_controllers, square)
+        sc.selected = False
+
+    def select_piece(self, piece: PieceController):
+        self.selected_piece = piece
+        self.highlight_square(self.game.find_square(piece.piece))
         for move in filter(lambda move: move.piece == piece.piece, self.game.possible_moves):
             end_square = move.get_end_square()
             end_piece = self.game.board[end_square] 
@@ -147,12 +155,13 @@ class BoardController(View, EventObserver):
                 pc.can_be_taken = True
 
     def deselect_piece(self):
-        for sc in self.square_controllers:
-            sc.selected = False
-            sc.has_move = False
-        for pc in self.piece_controllers:
-            pc.can_be_taken = False
-        self.selected_piece = None
+        if self.selected_piece != None:
+            self.unhighlight_square(self.game.find_square(self.selected_piece.piece))
+            for sc in self.square_controllers:
+                sc.has_move = False
+            for pc in self.piece_controllers:
+                pc.can_be_taken = False
+            self.selected_piece = None
 
     def set_held_piece(self, piece: PieceController):
         self.held_piece = piece
