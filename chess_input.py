@@ -149,9 +149,14 @@ class MouseChessInput(ChessInput):
 class AIChessInput(ChessInput):
     thread = None
     move = None
+
+    def __init__(self, board_controller, color):
+        super().__init__(board_controller)
+        self.color = color
+
     def get_move(self) -> Move | None:
         if self.move == None and self.thread == None:
-            self.thread = AIMove(self.board_controller.game)
+            self.thread = AIMove(self.board_controller.game, self.color)
             self.thread.start()
             self.waiting_for_move = True
             return None

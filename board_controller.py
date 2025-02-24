@@ -47,15 +47,15 @@ class BoardController(View, EventObserver):
         self.held_piece = None
         self.game_ended = False
         
+        opponent_color = self.player_color.next()
         player_input = MouseChessInput(self)
         if opponent_input == 'ai':
-            input = AIChessInput(self)
+            input = AIChessInput(self, opponent_color)
         elif opponent_input == 'mouse':
             input = player_input
         else:
             raise ValueError
 
-        opponent_color = self.player_color.next()
         self.chess_inputs:dict[Color, ChessInput] = {self.player_color: player_input, opponent_color: input}
 
     def setup(self, mouse: Mouse):
@@ -169,9 +169,10 @@ class BoardController(View, EventObserver):
         self.update_pieces()
 
     def clear_held_piece(self):
-        self.held_piece.clear_held_piece()
-        self.held_piece = None
-        self.update_pieces()
+        if self.held_piece != None:
+            self.held_piece.clear_held_piece()
+            self.held_piece = None
+            self.update_pieces()
 
     def create_promotion_picker(self, piece, square):
         x, y = get_square_pos(self.x, self.y, square, self.color_pov)
