@@ -5,6 +5,7 @@ from chess.chess import ChessBoard, Color
 from board_controller import BoardController
 from view.button import Button
 from view.timer import TimerBox
+from view.text import Text
 from view.taken_pieces_display import TakenPiecesDisplay
 from custom_events import EventAnnouncer, post_event, CustomEvent
 from screen.game_end_popup import GameEndPopup
@@ -54,13 +55,50 @@ class ChessScreen(Screen):
         self.add_element(self.taken_black_pieces_display)
         self.event_announcer.register_observer(self.taken_black_pieces_display)
 
-        self.black_timer = TimerBox(timer_x, timer_black_y, 1, self.image_library, '', 120, Color.BLACK)
+        self.black_timer = TimerBox(timer_x, timer_black_y, 1, self.image_library, '', 999, Color.BLACK)
         self.add_element(self.black_timer)
         self.event_announcer.register_observer(self.black_timer)
 
-        self.white_timer = TimerBox(timer_x, timer_white_y, 1, self.image_library, '', 120, Color.WHITE)
+        self.white_timer = TimerBox(timer_x, timer_white_y, 1, self.image_library, '', 999, Color.WHITE)
         self.add_element(self.white_timer)
         self.event_announcer.register_observer(self.white_timer)
+
+
+        
+        a = Text(16,80,80,144,1,self.image_library, '8')
+        self.add_element(a)
+        a = Text(16,144,80,208,1,self.image_library, '7')
+        self.add_element(a)
+        a = Text(16,208,80,272,1,self.image_library, '6')
+        self.add_element(a)
+        a = Text(16,272,80,336,1,self.image_library, '5')
+        self.add_element(a)
+        a = Text(16,336,80,400,1,self.image_library, '4')
+        self.add_element(a)
+        a = Text(16,400,80,464,1,self.image_library, '3')
+        self.add_element(a)
+        a = Text(16,464,80,528,1,self.image_library, '2')
+        self.add_element(a)
+        a = Text(16,528,80,592,1,self.image_library, '1')
+        self.add_element(a)
+
+
+        a = Text(80,594,144,658,1,self.image_library, 'A')
+        self.add_element(a)
+        a = Text(144,594,208,658,1,self.image_library, 'B')
+        self.add_element(a)
+        a = Text(208,594,272,658,1,self.image_library, 'C')
+        self.add_element(a)
+        a = Text(272,594,336,658,1,self.image_library, 'D')
+        self.add_element(a)
+        a = Text(336,594,400,658,1,self.image_library, 'E')
+        self.add_element(a)
+        a = Text(400,594,464,658,1,self.image_library, 'F')
+        self.add_element(a)
+        a = Text(464,594,528,658,1,self.image_library, 'G')
+        self.add_element(a)
+        a = Text(528,594,592,658,1,self.image_library, 'H')
+        self.add_element(a)
 
         self.game_end_popup = None
 

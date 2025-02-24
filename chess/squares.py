@@ -40,8 +40,8 @@ class Square(Enum):
         rank = int(self.value / 8)
         file = self.value % 8
         if (rank + file) % 2 == 0:
-            return Color.WHITE
-        return Color.BLACK
+            return Color.BLACK
+        return Color.WHITE
 
 
     def up(self):
