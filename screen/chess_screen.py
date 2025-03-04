@@ -1,13 +1,13 @@
-from drawing import ImageLibrary
-from mouse import Mouse
+from game.drawing import ImageLibrary
+from game.mouse import Mouse
 from screen.screen import Screen
 from chess.chess import ChessBoard, Color
-from board_controller import BoardController
+from game.board_controller import BoardController
 from view.button import Button
 from view.timer import TimerBox
 from view.text import Text
 from view.taken_pieces_display import TakenPiecesDisplay
-from custom_events import EventAnnouncer, post_event, CustomEvent
+from game.custom_events import EventAnnouncer, post_event, CustomEvent
 from screen.game_end_popup import GameEndPopup
 
 

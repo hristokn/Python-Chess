@@ -1,14 +1,14 @@
-from mouse import Mouse
+from game.mouse import Mouse
 from pygame.event import Event
-from custom_events import CustomEvent, post_event, EventObserver
+from game.custom_events import CustomEvent, post_event, EventObserver
 from pygame import Surface
-from drawing import Drawable, get_square_pos, SQUARE_SIZE, ImageLibrary
+from game.drawing import Drawable, get_square_pos, SQUARE_SIZE, ImageLibrary
 from chess.chess import ChessBoard, Square, Color, Piece
 from chess.finished_game import FinishedGame, VictoryType
 from view.view import View
 from view.chess_controller import SquareController, PieceController
 from view.promotion_picker import PromotionPicker
-from chess_input import ChessInput,MouseChessInput, AIChessInput
+from game.chess_input import ChessInput,MouseChessInput, AIChessInput
 
 def get_square_controller(square_controllers: list[SquareController], sq: Square):
     sc = None

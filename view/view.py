@@ -1,5 +1,5 @@
 from pygame import Surface
-from mouse import Clickable
+from game.mouse import Clickable
 from view.component import Component
 
 class View(Clickable, Component):

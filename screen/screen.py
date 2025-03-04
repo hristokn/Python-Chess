@@ -1,9 +1,9 @@
 from pygame.event import Event
-from custom_events import EventAnnouncer
+from game.custom_events import EventAnnouncer
 from view.component import Component
 from view.button import Button
-from drawing import ImageLibrary
-from mouse import Mouse
+from game.drawing import ImageLibrary
+from game.mouse import Mouse
 
 # class abstract
 # class Node:

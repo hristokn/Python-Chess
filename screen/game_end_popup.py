@@ -1,10 +1,10 @@
-from drawing import ImageLibrary
-from mouse import Mouse
+from game.drawing import ImageLibrary
+from game.mouse import Mouse
 from screen.screen import Screen
 from view.button import SmallTextButton
 from view.text import Text
 from view.image import Image
-from custom_events import EventAnnouncer, post_event, CustomEvent
+from game.custom_events import EventAnnouncer, post_event, CustomEvent
 from chess.enums import Color 
 from chess.finished_game import FinishedGame, VictoryType 
 

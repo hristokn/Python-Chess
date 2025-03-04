@@ -1,10 +1,9 @@
 import pygame
-from custom_events import CustomEvent, post_event
-from board_controller import BoardController
-from mouse import Mouse
+from game.custom_events import CustomEvent, post_event
+from game.mouse import Mouse
 from chess.enums import Color
-from drawing import ImageLibrary, IMAGES
-from custom_events import EventAnnouncer
+from game.drawing import ImageLibrary, IMAGES
+from game.custom_events import EventAnnouncer
 from screen.main_menu import MainMenu 
 from screen.chess_screen import ChessScreen 
 from screen.practice_chess_screen import PracticeChessScreen 

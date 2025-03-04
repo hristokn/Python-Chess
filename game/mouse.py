@@ -1,5 +1,5 @@
 from pygame.event import Event
-from custom_events import EventObserver
+from game.custom_events import EventObserver
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION
 
 LEFTMOUSEBUTTON = 1

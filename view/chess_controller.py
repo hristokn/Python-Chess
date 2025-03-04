@@ -1,5 +1,5 @@
 from view.view import View
-from drawing import ImageLibrary, get_piece_image_name, get_square_image, SQUARE_SIZE
+from game.drawing import ImageLibrary, get_piece_image_name, get_square_image, SQUARE_SIZE
 from pygame import Surface
 from pygame.event import Event
 

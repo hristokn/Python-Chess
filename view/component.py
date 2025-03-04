@@ -1,4 +1,4 @@
-from drawing import Drawable
+from game.drawing import Drawable
 
 
 class Component(Drawable):

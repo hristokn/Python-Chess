@@ -3,8 +3,8 @@ from pygame import Surface
 from pygame.event import Event
 from chess.chess import ChessBoard
 from chess.enums import PieceType, Color
-from drawing import get_piece_image_name_tiny
-from custom_events import EventObserver, CustomEvent
+from game.drawing import get_piece_image_name_tiny
+from game.custom_events import EventObserver, CustomEvent
 
 class TakenPiecesDisplay(View, EventObserver):
     def __init__(self, x1, y1, priority, img_lib, img, game, color):

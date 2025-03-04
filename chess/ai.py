@@ -38,7 +38,7 @@ def pick_move(chess_board: ChessBoard, color: Color):
     boardstate.killer_move_depth = None
     index = len(boardstate.past_moves)
     if piece_count > 8:
-        value = alphabeta_rec(boardstate, 3, _min,  _max, maximising, index)
+        value = alphabeta_rec(boardstate, 4, _min,  _max, maximising, index)
     else:
         value = alphabeta_rec(boardstate, 10, -1,  +1, maximising, index)
 
@@ -92,9 +92,9 @@ class Boardstate:
 
 
     def value_board(self):
-        MOVE_VALUE = 0.03
+        MOVE_VALUE = 0.02
         CHECK_VALUE = 0.50
-        TAKE_VALUE = 0.15
+        TAKE_VALUE = 0.10
         white_piece_value = sum([piece_values[piece.type] for piece in self.board.values() if piece != None and piece.color == Color.WHITE])
         black_piece_value = sum([piece_values[piece.type] for piece in self.board.values() if piece != None and piece.color == Color.BLACK])
         
@@ -137,8 +137,8 @@ class ValueMove:
             return other
         else: 
             return self
-_min = ValueMove(-1000, None)
-_max = ValueMove(1000,None)
+_min = ValueMove(float('-inf'), None)
+_max = ValueMove(float('inf'),None)
         
 
 

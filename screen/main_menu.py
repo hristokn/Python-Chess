@@ -1,9 +1,9 @@
 from screen.screen import Screen
-from custom_events import post_event, CustomEvent
+from game.custom_events import post_event, CustomEvent
 from view.view import View
 from view.button import TextButton, SwitchButton
 from pygame.display import get_surface
-from custom_events import EventAnnouncer
+from game.custom_events import EventAnnouncer
 from screen.chess_screen import ChessScreen
 from chess.enums import Color
 import pygame
