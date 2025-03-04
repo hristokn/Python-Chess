@@ -7,6 +7,7 @@ from view.button import Button
 from view.taken_pieces_display import TakenPiecesDisplay
 from custom_events import EventAnnouncer, post_event, CustomEvent
 from screen.game_end_popup import GameEndPopup
+from view.text import Text
 
 class PracticeChessScreen(Screen):
     def __init__(self, mouse: Mouse, image_library: ImageLibrary, event_announcer: EventAnnouncer, color: Color):
@@ -48,6 +49,22 @@ class PracticeChessScreen(Screen):
         self.add_element(self.taken_black_pieces_display)
         self.event_announcer.register_observer(self.taken_black_pieces_display)
 
+        for i in range(0,8):
+            labels_rank = ['1','2','3','4','5','6','7','8']
+            step = 64
+            label_rank = Text(self.draw_x1 + 16, self.draw_y1 + 528 - step * i, 
+                              self.draw_x1 + 80, self.draw_y1 + 592 - step * i,
+                              1,self.image_library, labels_rank[i])
+            self.add_element(label_rank)
+
+
+            labels_rank = ['A','B','C','D','E','F','G','H']
+            label_file = Text(self.draw_x1 + 80 + step * i, self.draw_y1 + 594, 
+                              self.draw_x1 + 144 + step * i, self.draw_y1 + 658,
+                              1,self.image_library, labels_rank[i])
+            self.add_element(label_file)
+
+
         self.game_end_popup = None
 
     def rotate(self):
@@ -67,7 +84,7 @@ class PracticeChessScreen(Screen):
 
     def create_game_end_popup(self):
         self.game_end_popup = GameEndPopup(self.mouse, self.image_library, self.event_announcer,
-                                           300, 300, self.board_controller.player_color, self.board_controller.finished_game)
+                                        300, 300, self.board_controller.player_color, self.board_controller.finished_game, 'practice_game')
         self.add_element(self.game_end_popup)
 
     def remove_game_end_popup(self):

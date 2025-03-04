@@ -11,10 +11,10 @@ from chess.finished_game import FinishedGame, VictoryType
 
 class GameEndPopup(Screen):
     def __init__(self, mouse: Mouse, image_library: ImageLibrary, event_announcer: EventAnnouncer, x, y,
-                  color: Color, finished_game: FinishedGame):
+                  color: Color, finished_game: FinishedGame, new_game_screen_name: str):
         super().__init__(mouse, image_library, event_announcer, x, y, '')
         self.priority = 20
-
+        self.new_game_screen_name = new_game_screen_name
         self.player_color = color
         
         text = ''
@@ -48,7 +48,7 @@ class GameEndPopup(Screen):
 
 
     def start_new_game(self):
-        post_event(CustomEvent.CHANGE_SCREEN, screen_name='chess_game', color=self.player_color)
+        post_event(CustomEvent.CHANGE_SCREEN, screen_name=self.new_game_screen_name, color=self.player_color)
 
     def go_to_main_menu(self):
         post_event(CustomEvent.CHANGE_SCREEN, screen_name='main_menu')

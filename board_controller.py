@@ -133,6 +133,13 @@ class BoardController(View, EventObserver):
             p.move(x,y)
             p.update_image()
     
+    def highlight_prev_move(self, move):
+        ...     
+
+    def highlight_premove(self, start_sq, end_sq):
+        self.highlight_square(start_sq)
+        self.highlight_square(end_sq)
+
     def highlight_square(self, square: Square):
         sc = get_square_controller(self.square_controllers, square)
         sc.selected = True
@@ -245,7 +252,7 @@ class BoardController(View, EventObserver):
             self.finished_game = FinishedGame(self.game, None, VictoryType.DRAW)
         elif self.game.in_checkmate():
             self.game_ended = True
-            color = self.game.color_to_play.next()
+            color = self.game.color_to_play.previous()
             self.finished_game = FinishedGame(self.game, color, VictoryType.CHECKMATE)
 
     def undo_move(self):

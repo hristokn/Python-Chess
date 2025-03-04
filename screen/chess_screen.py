@@ -63,42 +63,21 @@ class ChessScreen(Screen):
         self.add_element(self.white_timer)
         self.event_announcer.register_observer(self.white_timer)
 
-
-        
-        a = Text(16,80,80,144,1,self.image_library, '8')
-        self.add_element(a)
-        a = Text(16,144,80,208,1,self.image_library, '7')
-        self.add_element(a)
-        a = Text(16,208,80,272,1,self.image_library, '6')
-        self.add_element(a)
-        a = Text(16,272,80,336,1,self.image_library, '5')
-        self.add_element(a)
-        a = Text(16,336,80,400,1,self.image_library, '4')
-        self.add_element(a)
-        a = Text(16,400,80,464,1,self.image_library, '3')
-        self.add_element(a)
-        a = Text(16,464,80,528,1,self.image_library, '2')
-        self.add_element(a)
-        a = Text(16,528,80,592,1,self.image_library, '1')
-        self.add_element(a)
+        for i in range(0,8):
+            labels_rank = ['1','2','3','4','5','6','7','8']
+            step = 64
+            label_rank = Text(self.draw_x1 + 16, self.draw_y1 + 528 - step * i, 
+                              self.draw_x1 + 80, self.draw_y1 + 592 - step * i,
+                              1,self.image_library, labels_rank[i])
+            self.add_element(label_rank)
 
 
-        a = Text(80,594,144,658,1,self.image_library, 'A')
-        self.add_element(a)
-        a = Text(144,594,208,658,1,self.image_library, 'B')
-        self.add_element(a)
-        a = Text(208,594,272,658,1,self.image_library, 'C')
-        self.add_element(a)
-        a = Text(272,594,336,658,1,self.image_library, 'D')
-        self.add_element(a)
-        a = Text(336,594,400,658,1,self.image_library, 'E')
-        self.add_element(a)
-        a = Text(400,594,464,658,1,self.image_library, 'F')
-        self.add_element(a)
-        a = Text(464,594,528,658,1,self.image_library, 'G')
-        self.add_element(a)
-        a = Text(528,594,592,658,1,self.image_library, 'H')
-        self.add_element(a)
+            labels_rank = ['A','B','C','D','E','F','G','H']
+            label_file = Text(self.draw_x1 + 80 + step * i, self.draw_y1 + 594, 
+                              self.draw_x1 + 144 + step * i, self.draw_y1 + 658,
+                              1,self.image_library, labels_rank[i])
+            self.add_element(label_file)
+
 
         self.game_end_popup = None
 
@@ -126,7 +105,7 @@ class ChessScreen(Screen):
 
     def create_game_end_popup(self):
         self.game_end_popup = GameEndPopup(self.mouse, self.image_library, self.event_announcer,
-                                           300, 300, self.board_controller.player_color, self.board_controller.finished_game)
+                                           300, 300, self.board_controller.player_color, self.board_controller.finished_game, 'chess_game')
         self.add_element(self.game_end_popup)
 
     def remove_game_end_popup(self):

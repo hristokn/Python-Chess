@@ -122,10 +122,9 @@ class MouseChessInput(ChessInput):
 
     def save_premove(self, piece, square):
         self.has_premove = True
+        self.board_controller.highlight_premove(self.board_controller.game.find_square(piece), square)
         self.premove_piece = piece
-        self.board_controller.highlight_square(self.board_controller.game.find_square(piece))
         self.premove_square = square
-        self.board_controller.highlight_square(square)
 
     def remove_premove(self):
         self.board_controller.unhighlight_square(self.board_controller.game.find_square(self.premove_piece))

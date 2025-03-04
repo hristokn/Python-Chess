@@ -45,13 +45,13 @@ class ChessBoard:
         self.taken_pieces: list[Piece] = []
         self.color_to_play = first_color
 
-    def king_in_check(self, color: Color):
+    def king_in_check(self, king_color: Color):
         other_colors = list(Color)
-        other_colors.remove(color)
+        other_colors.remove(king_color)
         for color in other_colors:
             possible_moves = self.get_possible_moves_without_king(color)
             for move in possible_moves:
-                is_king = lambda piece: piece.type == PieceType.KING and piece.color == color
+                is_king = lambda piece: piece.type == PieceType.KING and piece.color == king_color
                 if len(list(filter(is_king, move.taken))) != 0:
                     return True
         return False
