@@ -40,3 +40,4 @@ Some features I would like to add:
 
 ## Special thanks
 - itch.io user [bz-game](https://bz-game.itch.io/) for the sprites of the chess board and pieces 
+- chess.com for the sounds 
