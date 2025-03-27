@@ -100,7 +100,9 @@ class ChessScreen(Screen):
     
     def update(self):
         super().update()
-        if self.board_controller.game_ended and self.game_end_popup == None:
+
+    def receive_event(self, event):
+        if event.type == CustomEvent.FINISHED_GAME.value and self.game_end_popup == None:
             self.create_game_end_popup()    
 
     def create_game_end_popup(self):

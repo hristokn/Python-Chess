@@ -3,9 +3,9 @@ from pygame.font import SysFont, get_default_font
 from pygame.event import Event
 from view.view import View
 from time import time_ns
-from game.custom_events import CustomEvent, EventObserver, post_event
+from game.custom_events import CustomEvent, post_event
 
-class TimerBox(View, EventObserver):
+class TimerBox(View):
     def __init__(self, x1, y1, priority, img_lib, img, seconds, color):
         View.__init__(self, x1, y1, priority, img_lib, img)
         self._timer = Timer(seconds)
@@ -33,7 +33,9 @@ class TimerBox(View, EventObserver):
         return False
     
     def receive_event(self, event):
-        if event.type == CustomEvent.PLAYED_MOVE.value:
+        if event.type == CustomEvent.FINISHED_GAME.value:
+            self._timer.pause_timer()
+        elif event.type == CustomEvent.PLAYED_MOVE.value:
             if not self._started:
                 if self._color != event.color:
                     self._timer.start_timer()

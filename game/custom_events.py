@@ -11,6 +11,7 @@ class CustomEvent(AutoEvent):
     TIMER_END = auto()
     CHANGE_SCREEN = auto()
     UNDID_MOVE = auto()
+    FINISHED_GAME = auto()
 
 def post_event(event: CustomEvent, **kwargs):
     event = Event(event.value)

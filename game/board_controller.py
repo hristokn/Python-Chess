@@ -26,7 +26,7 @@ def get_piece_controller(piece_controllers: list[PieceController], piece):
             break
     return piece_controller
 
-class BoardController(View, EventObserver):
+class BoardController(View):
     def __init__(self, image_library: ImageLibrary,
                  color, x, y, opponent_input: str):
         board_background = Surface((8 * SQUARE_SIZE, 8 * SQUARE_SIZE))
@@ -48,7 +48,7 @@ class BoardController(View, EventObserver):
         self.game_ended = False
         
         opponent_color = self.player_color.next()
-        player_input = MouseChessInput(self)
+        player_input = AIChessInput(self, opponent_color.next())
         if opponent_input == 'ai':
             input = AIChessInput(self, opponent_color)
         elif opponent_input == 'mouse':
@@ -106,14 +106,14 @@ class BoardController(View, EventObserver):
             self._promotion_picker.draw(surface)
 
     def update(self):
+        if self._promotion_picker != None:
+            self._promotion_picker.update()
         if self.game_ended:
-            pass
+            return
         for input in self.chess_inputs.values():
             input.update()
         move = self.chess_inputs[self.game.color_to_play].get_move()
         self.try_move(move)
-        if self._promotion_picker != None:
-            self._promotion_picker.update()
 
     def update_pieces(self):
         for square, piece in self.game.board.items():
@@ -249,20 +249,20 @@ class BoardController(View, EventObserver):
     
     def receive_event(self, event):
         if event.type == CustomEvent.TIMER_END.value:
-            self.game_ended = True
-            color = event.color.next()
-            self.finished_game = FinishedGame(self.game, color, VictoryType.TIMEOUT)
+            self.finish_game(VictoryType.TIMEOUT, event.color.next())
 
     def try_finish_game(self):
         if self.game_ended:
             pass
         elif self.game.in_draw():
-            self.game_ended = True
-            self.finished_game = FinishedGame(self.game, None, VictoryType.DRAW)
+            self.finish_game(VictoryType.DRAW, None)
         elif self.game.in_checkmate():
+            self.finish_game(VictoryType.CHECKMATE, self.game.color_to_play.previous())
+
+    def finish_game(self, victory_type: VictoryType, color: Color):
             self.game_ended = True
-            color = self.game.color_to_play.previous()
-            self.finished_game = FinishedGame(self.game, color, VictoryType.CHECKMATE)
+            self.finished_game = FinishedGame(self.game, color, victory_type)
+            post_event(CustomEvent.FINISHED_GAME, color = color)
 
     def undo_move(self):
         self.game.undo_last_move()

@@ -27,9 +27,9 @@ class Screen(Component):
 
     def remove_element(self, element):
         self.elements.remove(element)
-        self.free_element(element)
+        self.destroy_element(element)
         if isinstance(element, Screen):
-            element.free_elements()
+            element.destroy_elements()
 
     def update(self):
         for element in self.elements:

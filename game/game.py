@@ -85,6 +85,7 @@ class Game:
             self.screen.destroy()
             self.remove_object(self.screen)
         self.screen = new_screen
+        self.event_announcer.register_observer(new_screen)
         self.add_object(new_screen)
 
 
