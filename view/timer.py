@@ -12,6 +12,7 @@ class TimerBox(View):
         self._color = color
         self._font = SysFont(get_default_font(), 40)
         self._started = False
+        self.low_time_warning_played = False
 
     def draw(self, surface: Surface):
         box = Surface((80, 200))
@@ -21,6 +22,9 @@ class TimerBox(View):
 
     def update(self):
         self._timer.update()  
+        if self._timer.remaining() <= self._timer.LOW_TIME_THRESHOLD_NS and not self.low_time_waring_played:
+            self.low_time_warning_played = True
+            post_event(CustomEvent.LOW_TIME, color=self._color)
         if self._timer.remaining() <= 0:
             self.finish_timer()
 
@@ -56,6 +60,7 @@ class TimerBox(View):
     
 
 class Timer():
+    LOW_TIME_THRESHOLD_NS = 10 * 1_000_000_000
     def __init__(self, seconds):
         self._nanoseconds = seconds*1_000_000_000
         self._remaining = seconds*1_000_000_000
@@ -79,7 +84,7 @@ class Timer():
         self._remaining = self._nanoseconds + self._elapsed + self._elapsed_total
 
     def remaining(self):
-        return self._remaining / 1_000_000_000
+        return self._remaining
 
     def remaining_seconds(self):
         return int(round(self._remaining / 1_000_000_000, 0))

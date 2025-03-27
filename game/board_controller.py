@@ -48,7 +48,7 @@ class BoardController(View):
         self.game_ended = False
         
         opponent_color = self.player_color.next()
-        player_input = AIChessInput(self, opponent_color.next())
+        player_input = MouseChessInput(self)
         if opponent_input == 'ai':
             input = AIChessInput(self, opponent_color)
         elif opponent_input == 'mouse':
@@ -222,13 +222,27 @@ class BoardController(View):
 
         self.remove_promotion_picker()
 
+    def post_played_move_event(self, move, color: Color):
+        if self.game.in_checkmate():
+            post_event(CustomEvent.PLAYED_MOVE, color=color, is_checkmate=True)
+        elif self.game.king_in_check(color.next()):
+            post_event(CustomEvent.PLAYED_MOVE, color=color, is_check=True)
+        elif getattr(move, 'is_castle', False):
+            post_event(CustomEvent.PLAYED_MOVE, color=color, is_castle=True)
+        elif self._promotion_picker != None:
+            post_event(CustomEvent.PLAYED_MOVE, color=color, is_promotion=True)
+        elif len(move.taken) != 0:
+            post_event(CustomEvent.PLAYED_MOVE, color=color, is_capture=True)
+        else:
+            post_event(CustomEvent.PLAYED_MOVE, color=color)
+
     def try_move(self, move) -> bool:
         _color=self.game.color_to_play
         self.unhighlight_last_move()
         played = self.game.play_move(move)
         if played:
             self.update_pieces()
-            post_event(CustomEvent.PLAYED_MOVE, color=_color)
+            self.post_played_move_event(move, _color)
             self.try_finish_game()
         self.highlight_last_move()
         return played

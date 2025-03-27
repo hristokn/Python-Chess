@@ -9,11 +9,14 @@ from view.text import Text
 from view.taken_pieces_display import TakenPiecesDisplay
 from game.custom_events import EventAnnouncer, post_event, CustomEvent
 from screen.game_end_popup import GameEndPopup
+from game.sound_player import SoundPlayer
+from game.chess_sounds import ChessBoardSoundPlayer
 
 
 class ChessScreen(Screen):
-    def __init__(self, mouse: Mouse, image_library: ImageLibrary, event_announcer: EventAnnouncer, color: Color):
-        super().__init__(mouse, image_library, event_announcer, 0, 0, '')
+    def __init__(self, mouse: Mouse, image_library: ImageLibrary, event_announcer: EventAnnouncer,
+                 sound_player: SoundPlayer, color: Color):
+        super().__init__(mouse, image_library, event_announcer, sound_player, 0, 0, '')
         self.board_controller = BoardController(self.image_library, color, 80, 80, 'ai')
         self.board_controller.setup(self.mouse)
         self.event_announcer.register_observer(self.board_controller)
@@ -81,6 +84,10 @@ class ChessScreen(Screen):
 
         self.game_end_popup = None
 
+        chess_board_sound_player = ChessBoardSoundPlayer(self.sound_player)
+        self.add_element(chess_board_sound_player)
+        self.event_announcer.register_observer(chess_board_sound_player)
+
     def rotate(self):
         self.board_controller.rotate()
 
@@ -106,7 +113,7 @@ class ChessScreen(Screen):
             self.create_game_end_popup()    
 
     def create_game_end_popup(self):
-        self.game_end_popup = GameEndPopup(self.mouse, self.image_library, self.event_announcer,
+        self.game_end_popup = GameEndPopup(self.mouse, self.image_library, self.event_announcer, self.sound_player,
                                            300, 300, self.board_controller.player_color, self.board_controller.finished_game, 'chess_game')
         self.add_element(self.game_end_popup)
 

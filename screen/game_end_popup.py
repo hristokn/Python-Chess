@@ -7,12 +7,14 @@ from view.image import Image
 from game.custom_events import EventAnnouncer, post_event, CustomEvent
 from chess.enums import Color 
 from chess.finished_game import FinishedGame, VictoryType 
+from game.sound_player import SoundPlayer 
 
 
 class GameEndPopup(Screen):
-    def __init__(self, mouse: Mouse, image_library: ImageLibrary, event_announcer: EventAnnouncer, x, y,
+    def __init__(self, mouse: Mouse, image_library: ImageLibrary, event_announcer: EventAnnouncer, 
+                  sound_player: SoundPlayer, x, y,
                   color: Color, finished_game: FinishedGame, new_game_screen_name: str):
-        super().__init__(mouse, image_library, event_announcer, x, y, '')
+        super().__init__(mouse, image_library, event_announcer, sound_player, x, y, '')
         self.priority = 20
         self.new_game_screen_name = new_game_screen_name
         self.player_color = color

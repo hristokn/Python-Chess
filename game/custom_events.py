@@ -12,6 +12,7 @@ class CustomEvent(AutoEvent):
     CHANGE_SCREEN = auto()
     UNDID_MOVE = auto()
     FINISHED_GAME = auto()
+    LOW_TIME = auto()
 
 def post_event(event: CustomEvent, **kwargs):
     event = Event(event.value)

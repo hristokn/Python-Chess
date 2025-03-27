@@ -6,12 +6,14 @@ from pygame.display import get_surface
 from game.custom_events import EventAnnouncer
 from screen.chess_screen import ChessScreen
 from chess.enums import Color
+from game.sound_player import SoundPlayer
 import pygame
 
 
 class MainMenu(Screen):
-    def __init__(self, mouse, image_library, event_announcer: EventAnnouncer):
-        super().__init__(mouse, image_library, event_announcer, 0, 0, '')
+    def __init__(self, mouse, image_library, event_announcer: EventAnnouncer,
+                 sound_player: SoundPlayer):
+        super().__init__(mouse, image_library, event_announcer, sound_player,  0, 0, '')
 
         background_surface = pygame.Surface(get_surface().get_size())
         background_surface.fill('gray')
