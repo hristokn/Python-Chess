@@ -15,16 +15,20 @@ class ChessInput(ABC):
     def update(self):
         pass
 
+class Premove:
+    def __init__(self, starting_square, ending_square, piece):
+        self.starting_square = starting_square
+        self.ending_square = ending_square
+        self.piece = piece
+
 class MouseChessInput(ChessInput):
     def __init__(self, board_controller) -> None:
         super().__init__(board_controller)
         self.move = None
-        self.has_premove = False
-        self.premove_piece = None
-        self.premove_square = None
+        self.premove = None
 
     def get_move(self) -> Move | None:
-        if self.has_premove:
+        if self.premove != None:
             self.waiting_for_move = False
             return self.use_premove()
         elif self.move == None:
@@ -79,6 +83,8 @@ class MouseChessInput(ChessInput):
     def squaredown(self, square):
         if self.board_controller.selected_piece != None:
             self.create_move_square(square.square)
+        if self.board_controller.selected_piece == None and self.premove != None:
+            self.remove_premove()
 
     def up(self, obj):
         if isinstance(obj, PieceController):
@@ -110,7 +116,7 @@ class MouseChessInput(ChessInput):
         selected_piece = self.board_controller.selected_piece.piece
         self.board_controller.deselect_piece()
         
-        if self.has_premove:
+        if self.premove != None:
             self.remove_premove()
 
         if self.board_controller.game.multiple_moves_exist(selected_piece, square):
@@ -121,26 +127,18 @@ class MouseChessInput(ChessInput):
             self.save_premove(selected_piece, square)
 
     def save_premove(self, piece, square):
-        self.has_premove = True
-        self.board_controller.highlight_premove(self.board_controller.game.find_square(piece), square)
-        self.premove_piece = piece
-        self.premove_square = square
+        self.premove = Premove(self.board_controller.game.find_square(piece), square, piece)
+        self.board_controller.highlight_square(self.premove.starting_square)
+        self.board_controller.highlight_square(self.premove.ending_square)
 
     def remove_premove(self):
-        self.board_controller.unhighlight_square(self.board_controller.game.find_square(self.premove_piece))
-        self.board_controller.unhighlight_square(self.premove_square)
-        self.has_premove = False
-        self.premove_piece = None
-        self.premove_square = None
+        self.board_controller.unhighlight_square(self.premove.starting_square)
+        self.board_controller.unhighlight_square(self.premove.ending_square)
+        self.premove = None
     
     def use_premove(self) -> Move:
-        # if self.board_controller.get_piece_controller(self.premove_piece) == None:
-        #     self.has_premove = False
-        #     self.premove_piece = None
-        #     self.premove_square = None
-        #     return None
-        _premove_piece = self.premove_piece 
-        _premove_square = self.premove_square
+        _premove_piece = self.premove.piece 
+        _premove_square = self.premove.ending_square
         self.remove_premove()
         return self.board_controller.game.find_move(_premove_piece, _premove_square)
 

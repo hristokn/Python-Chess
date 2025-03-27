@@ -44,7 +44,7 @@ class PieceController(View):
 
     def recieve_click(self, event: Event) -> bool:
         if self.hidden:
-            return
+            return False
         super().recieve_click(event)
         x,y = event.pos
         if self.collides(x,y):

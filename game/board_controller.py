@@ -133,12 +133,19 @@ class BoardController(View, EventObserver):
             p.move(x,y)
             p.update_image()
     
-    def highlight_prev_move(self, move):
-        ...     
+    def highlight_last_move(self):
+        if len(self.game.past_moves) == 0:
+            return
+        move = self.game.past_moves[-1]
+        for sq in move.changes.keys():
+            self.highlight_square(sq)
 
-    def highlight_premove(self, start_sq, end_sq):
-        self.highlight_square(start_sq)
-        self.highlight_square(end_sq)
+    def unhighlight_last_move(self):
+        if len(self.game.past_moves) == 0:
+            return
+        move = self.game.past_moves[-1]
+        for sq in move.changes.keys():
+            self.unhighlight_square(sq)
 
     def highlight_square(self, square: Square):
         sc = get_square_controller(self.square_controllers, square)
@@ -217,11 +224,13 @@ class BoardController(View, EventObserver):
 
     def try_move(self, move) -> bool:
         _color=self.game.color_to_play
+        self.unhighlight_last_move()
         played = self.game.play_move(move)
         if played:
             self.update_pieces()
             post_event(CustomEvent.PLAYED_MOVE, color=_color)
             self.try_finish_game()
+        self.highlight_last_move()
         return played
 
     def recieve_click(self, event: Event) -> bool:
