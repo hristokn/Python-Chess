@@ -14,7 +14,19 @@ class CustomEvent(AutoEvent):
     FINISHED_GAME = auto()
     LOW_TIME = auto()
 
+CUSTOM_EVENTS_ATTRIBUTES = {
+    CustomEvent.PLAYED_MOVE: ['color'],
+    CustomEvent.TIMER_END: ['color'],
+    CustomEvent.CHANGE_SCREEN: ['screen_name'],
+    CustomEvent.UNDID_MOVE: [],
+    CustomEvent.FINISHED_GAME: ['color'],
+    CustomEvent.LOW_TIME: ['color'],
+}
+
 def post_event(event: CustomEvent, **kwargs):
+    for attribute in CUSTOM_EVENTS_ATTRIBUTES[event]:
+        if attribute not in kwargs.keys():
+            raise ValueError()
     event = Event(event.value)
     for keyword, arg in kwargs.items():
         if not hasattr(event, keyword):
