@@ -1,4 +1,5 @@
 from chess.moves import Move
+from chess.enums import Color
 from chess.ai import AIMove
 from view.chess_controller import PieceController, SquareController
 from abc import ABC, abstractmethod
@@ -22,10 +23,11 @@ class Premove:
         self.piece = piece
 
 class MouseChessInput(ChessInput):
-    def __init__(self, board_controller) -> None:
+    def __init__(self, board_controller, colors: Color) -> None:
         super().__init__(board_controller)
         self.move = None
         self.premove = None
+        self.colors = colors
 
     def get_move(self) -> Move | None:
         if self.premove != None:
@@ -34,7 +36,7 @@ class MouseChessInput(ChessInput):
         elif self.move == None:
             self.waiting_for_move = True
             return None
-        else:
+        elif self.move != None:
             self.waiting_for_move = False
             _move = self.move
             self.move = None
@@ -44,58 +46,63 @@ class MouseChessInput(ChessInput):
         self.handle_clicked_pieces()
 
     def handle_clicked_pieces(self):
-        down = None
-        up = None
+        _piecedown = None
+        _pieceup = None
+        _squaredown = None
+        _squareup = None
         for piece in self.board_controller.piece_controllers:
             if piece.left_buttop_down:
-                down = piece
+                _piecedown = piece
             if piece.left_buttop_up:
-                up = piece
+                _pieceup = piece
 
         for square in self.board_controller.square_controllers:
             if square.left_buttop_down:
-                down = square
+                _squaredown = square
             if square.left_buttop_up:
-                up = square
+                _squareup = square
 
-        if down != None:
-            self.down(down)
-            down.left_buttop_down = False
-        if up != None:
-            self.up(up)
-            up.left_buttop_up = False
+        if _piecedown != None:
+            self.piecedown(_piecedown)
+            _piecedown.left_buttop_down = False
 
-    def down(self, obj):
-        if isinstance(obj, PieceController):
-            self.piecedown(obj)
-        if isinstance(obj, SquareController):
-            self.squaredown(obj)
+        if _pieceup != None:
+            self.pieceup(_pieceup)
+            _pieceup.left_buttop_up = False
+
+        if _squaredown != None:
+            self.squaredown(_squaredown)
+            _squaredown.left_buttop_down = False
+
+        if _squareup != None:
+            self.squareup(_squareup)
+            _squareup.left_buttop_up = False
         
     def piecedown(self, piece):
-        if self.board_controller.selected_piece == None:
+        if (self.board_controller.selected_piece == None
+                and piece.piece.color in self.colors):
             self.board_controller.select_piece(piece)
             self.board_controller.set_held_piece(piece)
-        elif self.board_controller.selected_piece == piece:
+        elif (self.board_controller.selected_piece == piece
+                and piece.piece.color in self.colors):
             self.board_controller.set_held_piece(piece)
-        else:
+        elif self.board_controller.selected_piece != None:
             self.create_move_piece(piece)
 
     def squaredown(self, square):
-        if self.board_controller.selected_piece != None:
+        if (self.board_controller.selected_piece != None 
+                and self.board_controller.selected_piece.piece.color in self.colors):
             self.create_move_square(square.square)
         if self.board_controller.selected_piece == None and self.premove != None:
             self.remove_premove()
 
-    def up(self, obj):
-        if isinstance(obj, PieceController):
-            self.pieceup(obj)
-        if isinstance(obj, SquareController):
-            self.squareup(obj)
 
     def pieceup(self, piece):
         if self.board_controller.selected_piece == piece:
             self.board_controller.clear_held_piece()
-        elif self.board_controller.selected_piece != None and self.board_controller.held_piece != None:
+        elif (self.board_controller.selected_piece != None 
+                and self.board_controller.held_piece != None
+                and self.board_controller.selected_piece.piece.color in self.colors):
             self.create_move_piece(piece)
             self.board_controller.clear_held_piece()
 
@@ -160,6 +167,7 @@ class AIChessInput(ChessInput):
         elif self.move != None:
             _move = self.move
             self.move = None
+            self.waiting_for_move = False
             return _move
         else:
             return None

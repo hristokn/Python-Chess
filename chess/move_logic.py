@@ -110,7 +110,8 @@ def castle(square: Square, board: dict[Square: Piece], prev_moves: list[Move], d
         return moves
 
     rook = board[rook_square]
-    if rook != None and not has_moved_before(rook, prev_moves):
+    if (rook != None and rook.type == PieceType.ROOK  
+            and not has_moved_before(rook, prev_moves)):
         move.changes[rook_square] = None
         move.changes[sq1] = rook
         move.is_castle = True

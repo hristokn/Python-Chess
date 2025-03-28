@@ -48,10 +48,11 @@ class BoardController(View):
         self.game_ended = False
         
         opponent_color = self.player_color.next()
-        player_input = MouseChessInput(self)
+        player_input = MouseChessInput(self, [self.player_color])
         if opponent_input == 'ai':
             input = AIChessInput(self, opponent_color)
         elif opponent_input == 'mouse':
+            player_input.colors.append(opponent_color)
             input = player_input
         else:
             raise ValueError
@@ -170,7 +171,9 @@ class BoardController(View):
 
     def deselect_piece(self):
         if self.selected_piece != None:
-            self.unhighlight_square(self.game.find_square(self.selected_piece.piece))
+            square = self.game.find_square(self.selected_piece.piece)
+            if square != Square.UNKNOWN:
+                self.unhighlight_square(square)
             for sc in self.square_controllers:
                 sc.has_move = False
             for pc in self.piece_controllers:
@@ -274,9 +277,9 @@ class BoardController(View):
             self.finish_game(VictoryType.CHECKMATE, self.game.color_to_play.previous())
 
     def finish_game(self, victory_type: VictoryType, color: Color):
-            self.game_ended = True
-            self.finished_game = FinishedGame(self.game, color, victory_type)
-            post_event(CustomEvent.FINISHED_GAME, color = color)
+        self.game_ended = True
+        self.finished_game = FinishedGame(self.game, color, victory_type)
+        post_event(CustomEvent.FINISHED_GAME, color = color)
 
     def undo_move(self):
         self.game.undo_last_move()

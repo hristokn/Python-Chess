@@ -37,8 +37,7 @@ def pick_move(chess_board: ChessBoard, color: Color):
     boardstate.killer_move = None
     boardstate.killer_move_depth = None
     index = len(boardstate.past_moves)
-    if piece_count > 8:
-        value = alphabeta_rec(boardstate, 3, _min,  _max, maximising, index)
+    value = alphabeta_rec(boardstate, 3, _min,  _max, maximising, index)
     # else:
     #     value = alphabeta_rec(boardstate, 10, -1,  +1, maximising, index)
 
