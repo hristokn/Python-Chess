@@ -1,10 +1,12 @@
 from pygame.event import custom_type, post, Event
 from enum import Enum, auto
 
+
 class AutoEvent(Enum):
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         return custom_type()
+
 
 class CustomEvent(AutoEvent):
     PLAYED_MOVE = auto()
@@ -14,14 +16,16 @@ class CustomEvent(AutoEvent):
     FINISHED_GAME = auto()
     LOW_TIME = auto()
 
+
 CUSTOM_EVENTS_ATTRIBUTES = {
-    CustomEvent.PLAYED_MOVE: ['color'],
-    CustomEvent.TIMER_END: ['color'],
-    CustomEvent.CHANGE_SCREEN: ['screen_name'],
+    CustomEvent.PLAYED_MOVE: ["color"],
+    CustomEvent.TIMER_END: ["color"],
+    CustomEvent.CHANGE_SCREEN: ["screen_name"],
     CustomEvent.UNDID_MOVE: [],
-    CustomEvent.FINISHED_GAME: ['color'],
-    CustomEvent.LOW_TIME: ['color'],
+    CustomEvent.FINISHED_GAME: ["color"],
+    CustomEvent.LOW_TIME: ["color"],
 }
+
 
 def post_event(event: CustomEvent, **kwargs):
     for attribute in CUSTOM_EVENTS_ATTRIBUTES[event]:
@@ -43,7 +47,7 @@ class EventObserver:
 
 class EventAnnouncer:
     def __init__(self) -> None:
-        self.observers : list[EventObserver]  = []
+        self.observers: list[EventObserver] = []
 
     def announce_event(self, event: Event):
         for observer in self.observers:
@@ -57,4 +61,3 @@ class EventAnnouncer:
             self.observers.remove(observer)
         except ValueError:
             pass
-

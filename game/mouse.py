@@ -5,6 +5,7 @@ from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION
 LEFTMOUSEBUTTON = 1
 RIGHTMOUSEBUTTON = 2
 
+
 class Clickable:
     def __init__(self, x1, y1, x2, y2, priority):
         self.x1 = x1
@@ -21,8 +22,8 @@ class Clickable:
         return not (x <= self.x1 or x >= self.x2 or y <= self.y1 or y >= self.y2)
 
     def recieve_click(self, event: Event) -> bool:
-        x,y = event.pos
-        if self.collides(x,y):
+        x, y = event.pos
+        if self.collides(x, y):
             if event.type == MOUSEBUTTONUP and event.button == LEFTMOUSEBUTTON:
                 self.left_buttop_up = True
             elif event.type == MOUSEBUTTONUP and event.button == RIGHTMOUSEBUTTON:
@@ -56,15 +57,16 @@ class Clickable:
         self.y2 = self.y1 + height
 
     def width(self):
-        return self.x2-self.x1
+        return self.x2 - self.x1
 
     def height(self):
-        return self.y2-self.y1
+        return self.y2 - self.y1
+
 
 class Mouse(EventObserver):
     def __init__(self) -> None:
-        self.button_observer : list[Clickable]  = []
-        self.motion_observer : list[Clickable]  = []
+        self.button_observer: list[Clickable] = []
+        self.motion_observer: list[Clickable] = []
 
     def receive_event(self, event):
         if event.type == MOUSEBUTTONDOWN or event.type == MOUSEBUTTONUP:
@@ -74,8 +76,8 @@ class Mouse(EventObserver):
 
     def mouse_button(self, event):
         for clickable in self.button_observer:
-                if clickable.recieve_click(event):
-                    break
+            if clickable.recieve_click(event):
+                break
 
     def mouse_motion(self, event):
         for clickable in self.motion_observer:
@@ -85,17 +87,17 @@ class Mouse(EventObserver):
         self.button_observer.append(clickable)
         self.button_observer.sort(key=lambda c: c.priority, reverse=True)
 
-    def unregister_button_observer(self,clickable: Clickable):
-        try: 
+    def unregister_button_observer(self, clickable: Clickable):
+        try:
             self.button_observer.remove(clickable)
         except ValueError:
             pass
 
     def register_motion_observer(self, clickable: Clickable):
         self.motion_observer.append(clickable)
-    
+
     def unregister_motion_observer(self, clickable: Clickable):
-        try: 
+        try:
             self.motion_observer.remove(clickable)
         except ValueError:
             pass

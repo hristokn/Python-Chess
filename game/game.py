@@ -4,12 +4,13 @@ from game.mouse import Mouse
 from chess.enums import Color
 from game.drawing import ImageLibrary, IMAGES
 from game.custom_events import EventAnnouncer
-from screen.main_menu import MainMenu 
-from screen.chess_screen import ChessScreen 
-from screen.practice_chess_screen import PracticeChessScreen 
+from screen.main_menu import MainMenu
+from screen.chess_screen import ChessScreen
+from screen.practice_chess_screen import PracticeChessScreen
 from screen.screen import Screen
 from game.sound_player import SoundPlayer
 from game.chess_sounds import SOUNDS
+
 
 class Game:
     def __init__(self, width: int, height: int, framerate: int = 30):
@@ -48,7 +49,7 @@ class Game:
 
         pygame.event.pump()
         for obj in self.objects:
-             obj.update()
+            obj.update()
 
     def draw(self):
         self.display.fill("gray")
@@ -79,13 +80,30 @@ class Game:
     def open_screen(self, event: pygame.event.Event):
         screen_name = event.screen_name
         new_screen = None
-        match(screen_name):
-            case 'main_menu':
-                new_screen = MainMenu(self.mouse, self.image_library, self.event_announcer, self.sound_player)
-            case 'chess_game':
-                new_screen = ChessScreen(self.mouse, self.image_library, self.event_announcer, self.sound_player, event.color)
-            case 'practice_game':
-                new_screen = PracticeChessScreen(self.mouse, self.image_library, self.event_announcer, self.sound_player, event.color)
+        match (screen_name):
+            case "main_menu":
+                new_screen = MainMenu(
+                    self.mouse,
+                    self.image_library,
+                    self.event_announcer,
+                    self.sound_player,
+                )
+            case "chess_game":
+                new_screen = ChessScreen(
+                    self.mouse,
+                    self.image_library,
+                    self.event_announcer,
+                    self.sound_player,
+                    event.color,
+                )
+            case "practice_game":
+                new_screen = PracticeChessScreen(
+                    self.mouse,
+                    self.image_library,
+                    self.event_announcer,
+                    self.sound_player,
+                    event.color,
+                )
 
         if self.screen != None:
             self.screen.destroy()
@@ -101,14 +119,13 @@ class ChessGame(Game):
         self.board_x = 20
         self.board_y = 80
         self.color = Color.WHITE
-                
+
     def run(self):
-        post_event(CustomEvent.CHANGE_SCREEN, screen_name='main_menu')
+        post_event(CustomEvent.CHANGE_SCREEN, screen_name="main_menu")
         super().run()
 
     def _get_images(self):
         return IMAGES
-  
+
     def _get_sounds(self):
         return SOUNDS
-  

@@ -6,6 +6,7 @@ from chess.enums import PieceType, Color
 from game.drawing import get_piece_image_name_tiny
 from game.custom_events import CustomEvent
 
+
 class TakenPiecesDisplay(View):
     def __init__(self, x1, y1, priority, img_lib, img, game, color):
         View.__init__(self, x1, y1, priority, img_lib, img)
@@ -14,26 +15,24 @@ class TakenPiecesDisplay(View):
         self._display: dict[PieceType, int] = {}
         self._margin = 30
 
-    
     def draw(self, surface: Surface):
         offset = 0
         for type, count in self._display:
             for i in range(count):
                 offset += self._margin
-                surface.blit(self.image_library[get_piece_image_name_tiny(self._color, type)], (self.draw_x1 + offset, self.draw_y1))
-
+                surface.blit(
+                    self.image_library[get_piece_image_name_tiny(self._color, type)],
+                    (self.draw_x1 + offset, self.draw_y1),
+                )
 
     def update(self):
         pass
 
-
     def recieve_mouse_motion(self, event: Event):
         return super().recieve_mouse_motion(event)
-    
 
     def recieve_click(self, event: Event) -> bool:
         return False
-    
 
     def update_display(self):
         display = {}
@@ -43,10 +42,12 @@ class TakenPiecesDisplay(View):
                     display[piece.type] += 1
                 except KeyError:
                     display[piece.type] = 1
-        
-        self._display = sorted(display.items(), key = lambda i: i[0].value)
 
+        self._display = sorted(display.items(), key=lambda i: i[0].value)
 
     def receive_event(self, event):
-        if event.type == CustomEvent.PLAYED_MOVE.value or event.type == CustomEvent.UNDID_MOVE.value:
+        if (
+            event.type == CustomEvent.PLAYED_MOVE.value
+            or event.type == CustomEvent.UNDID_MOVE.value
+        ):
             self.update_display()

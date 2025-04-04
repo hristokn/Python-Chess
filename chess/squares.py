@@ -2,6 +2,7 @@ from enum import Enum
 from abc import ABC
 from chess.enums import Color
 
+
 class Square(Enum):
 
     @classmethod
@@ -17,24 +18,23 @@ class Square(Enum):
         file = self.value % 8
         match file:
             case 0:
-                result = 'a' + result
+                result = "a" + result
             case 1:
-                result = 'b' + result
+                result = "b" + result
             case 2:
-                result = 'c' + result
+                result = "c" + result
             case 3:
-                result = 'd' + result
+                result = "d" + result
             case 4:
-                result = 'e' + result
+                result = "e" + result
             case 5:
-                result = 'f' + result
+                result = "f" + result
             case 6:
-                result = 'g' + result
+                result = "g" + result
             case 7:
-                result = 'h' + result
+                result = "h" + result
 
         return result
-
 
     def color(self):
         rank = int(self.value / 8)
@@ -42,7 +42,6 @@ class Square(Enum):
         if (rank + file) % 2 == 0:
             return Color.BLACK
         return Color.WHITE
-
 
     def up(self):
         return WhiteOrientation.up(self)
@@ -134,19 +133,20 @@ class Square(Enum):
     H8 = 63
     UNKNOWN = 64
 
+
 class Orientation(ABC):
     @staticmethod
     def up(square: Square):
         return NotImplementedError
-    
+
     @staticmethod
     def down(square: Square):
         return NotImplementedError
-    
+
     @staticmethod
     def left(square: Square):
         return NotImplementedError
-    
+
     @staticmethod
     def right(square: Square):
         return NotImplementedError
@@ -154,89 +154,99 @@ class Orientation(ABC):
     @staticmethod
     def upleft(square: Square):
         return NotImplementedError
-    
+
     @staticmethod
     def upright(square: Square):
         return NotImplementedError
-    
+
     @staticmethod
     def downleft(square: Square):
         return NotImplementedError
-    
+
     @staticmethod
     def downright(square: Square):
         return NotImplementedError
-    
+
     @staticmethod
-    def _upleft(square: Square,
-    orientation):
+    def _upleft(square: Square, orientation):
         return orientation.left(orientation.up(square))
 
     @staticmethod
-    def _upright(square: Square,
-    orientation):
+    def _upright(square: Square, orientation):
         return orientation.right(orientation.up(square))
-    
+
     @staticmethod
-    def _downleft(square: Square,
-    orientation):
+    def _downleft(square: Square, orientation):
         return orientation.left(orientation.down(square))
-    
+
     @staticmethod
-    def _downright(square: Square,
-    orientation):
+    def _downright(square: Square, orientation):
         return orientation.right(orientation.down(square))
-    
+
+
 class WhiteOrientation(Orientation):
     @staticmethod
     def up(square: Square):
         if square == Square.UNKNOWN:
             return Square.UNKNOWN
         return Square(square.value + 8)
-    
+
     @staticmethod
     def down(square: Square):
         if square == Square.UNKNOWN:
             return Square.UNKNOWN
         return Square(square.value - 8)
-    
+
     @staticmethod
     def left(square: Square):
         if square == Square.UNKNOWN:
             return Square.UNKNOWN
-        if square  in [Square.A1, Square.A2, Square.A3, Square.A4,
-                       Square.A5, Square.A6, Square.A7, Square.A8]:
+        if square in [
+            Square.A1,
+            Square.A2,
+            Square.A3,
+            Square.A4,
+            Square.A5,
+            Square.A6,
+            Square.A7,
+            Square.A8,
+        ]:
             return Square.UNKNOWN
         return Square(square.value - 1)
-    
+
     @staticmethod
     def right(square: Square):
         if square == Square.UNKNOWN:
             return Square.UNKNOWN
-        if square  in [Square.H1, Square.H2, Square.H3, Square.H4,
-                       Square.H5, Square.H6, Square.H7, Square.H8]:
+        if square in [
+            Square.H1,
+            Square.H2,
+            Square.H3,
+            Square.H4,
+            Square.H5,
+            Square.H6,
+            Square.H7,
+            Square.H8,
+        ]:
             return Square.UNKNOWN
         return Square(square.value + 1)
 
     @staticmethod
     def upleft(square: Square):
-        return super(__class__, __class__)._upleft(square,
-    __class__)
-    
+        return super(__class__, __class__)._upleft(square, __class__)
+
     @staticmethod
     def upright(square: Square):
-        return super(__class__, __class__)._upright(square,
-    __class__)
-    
+        return super(__class__, __class__)._upright(square, __class__)
+
     @staticmethod
     def downleft(square: Square):
-        return super(__class__, __class__)._downleft(square,
-    __class__)
-    
+        return super(__class__, __class__)._downleft(square, __class__)
+
     @staticmethod
     def downright(square: Square):
-        return super(__class__, __class__)._downright(square,
-    __class__)
+        return super(__class__, __class__)._downright(square, __class__)
+
 
 class BlackOrientation(Orientation):
     @staticmethod
@@ -244,47 +254,59 @@ class BlackOrientation(Orientation):
         if square == Square.UNKNOWN:
             return Square.UNKNOWN
         return Square(square.value - 8)
-    
+
     @staticmethod
     def down(square: Square):
         if square == Square.UNKNOWN:
             return Square.UNKNOWN
         return Square(square.value + 8)
-    
+
     @staticmethod
     def left(square: Square):
         if square == Square.UNKNOWN:
             return Square.UNKNOWN
-        if square  in [Square.H1, Square.H2, Square.H3, Square.H4,
-                       Square.H5, Square.H6,Square.H7, Square.H8]:
+        if square in [
+            Square.H1,
+            Square.H2,
+            Square.H3,
+            Square.H4,
+            Square.H5,
+            Square.H6,
+            Square.H7,
+            Square.H8,
+        ]:
             return Square.UNKNOWN
         return Square(square.value + 1)
-    
+
     @staticmethod
     def right(square: Square):
         if square == Square.UNKNOWN:
             return Square.UNKNOWN
-        if square  in [Square.A1, Square.A2, Square.A3, Square.A4,
-                       Square.A5, Square.A6, Square.A7, Square.A8]:
+        if square in [
+            Square.A1,
+            Square.A2,
+            Square.A3,
+            Square.A4,
+            Square.A5,
+            Square.A6,
+            Square.A7,
+            Square.A8,
+        ]:
             return Square.UNKNOWN
         return Square(square.value - 1)
-    
+
     @staticmethod
     def upleft(square: Square):
-        return super(__class__, __class__)._upleft(square,
-    __class__)
-    
+        return super(__class__, __class__)._upleft(square, __class__)
+
     @staticmethod
     def upright(square: Square):
-        return super(__class__, __class__)._upright(square,
-    __class__)
-    
+        return super(__class__, __class__)._upright(square, __class__)
+
     @staticmethod
     def downleft(square: Square):
-        return super(__class__, __class__)._downleft(square,
-    __class__)
-    
+        return super(__class__, __class__)._downleft(square, __class__)
+
     @staticmethod
     def downright(square: Square):
-        return super(__class__, __class__)._downright(square,
-    __class__)
+        return super(__class__, __class__)._downright(square, __class__)

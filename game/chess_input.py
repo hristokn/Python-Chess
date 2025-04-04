@@ -4,6 +4,7 @@ from chess.ai import AIMove
 from view.chess_controller import PieceController, SquareController
 from abc import ABC, abstractmethod
 
+
 class ChessInput(ABC):
     def __init__(self, board_controller) -> None:
         self.waiting_for_move = False
@@ -16,11 +17,13 @@ class ChessInput(ABC):
     def update(self):
         pass
 
+
 class Premove:
     def __init__(self, starting_square, ending_square, piece):
         self.starting_square = starting_square
         self.ending_square = ending_square
         self.piece = piece
+
 
 class MouseChessInput(ChessInput):
     def __init__(self, board_controller, colors: Color) -> None:
@@ -77,32 +80,39 @@ class MouseChessInput(ChessInput):
         if _squareup != None:
             self.squareup(_squareup)
             _squareup.left_buttop_up = False
-        
+
     def piecedown(self, piece):
-        if (self.board_controller.selected_piece == None
-                and piece.piece.color in self.colors):
+        if (
+            self.board_controller.selected_piece == None
+            and piece.piece.color in self.colors
+        ):
             self.board_controller.select_piece(piece)
             self.board_controller.set_held_piece(piece)
-        elif (self.board_controller.selected_piece == piece
-                and piece.piece.color in self.colors):
+        elif (
+            self.board_controller.selected_piece == piece
+            and piece.piece.color in self.colors
+        ):
             self.board_controller.set_held_piece(piece)
         elif self.board_controller.selected_piece != None:
             self.create_move_piece(piece)
 
     def squaredown(self, square):
-        if (self.board_controller.selected_piece != None 
-                and self.board_controller.selected_piece.piece.color in self.colors):
+        if (
+            self.board_controller.selected_piece != None
+            and self.board_controller.selected_piece.piece.color in self.colors
+        ):
             self.create_move_square(square.square)
         if self.board_controller.selected_piece == None and self.premove != None:
             self.remove_premove()
 
-
     def pieceup(self, piece):
         if self.board_controller.selected_piece == piece:
             self.board_controller.clear_held_piece()
-        elif (self.board_controller.selected_piece != None 
-                and self.board_controller.held_piece != None
-                and self.board_controller.selected_piece.piece.color in self.colors):
+        elif (
+            self.board_controller.selected_piece != None
+            and self.board_controller.held_piece != None
+            and self.board_controller.selected_piece.piece.color in self.colors
+        ):
             self.create_move_piece(piece)
             self.board_controller.clear_held_piece()
 
@@ -122,7 +132,7 @@ class MouseChessInput(ChessInput):
     def create_move_square(self, square):
         selected_piece = self.board_controller.selected_piece.piece
         self.board_controller.deselect_piece()
-        
+
         if self.premove != None:
             self.remove_premove()
 
@@ -134,7 +144,9 @@ class MouseChessInput(ChessInput):
             self.save_premove(selected_piece, square)
 
     def save_premove(self, piece, square):
-        self.premove = Premove(self.board_controller.game.find_square(piece), square, piece)
+        self.premove = Premove(
+            self.board_controller.game.find_square(piece), square, piece
+        )
         self.board_controller.highlight_square(self.premove.starting_square)
         self.board_controller.highlight_square(self.premove.ending_square)
 
@@ -142,9 +154,9 @@ class MouseChessInput(ChessInput):
         self.board_controller.unhighlight_square(self.premove.starting_square)
         self.board_controller.unhighlight_square(self.premove.ending_square)
         self.premove = None
-    
+
     def use_premove(self) -> Move:
-        _premove_piece = self.premove.piece 
+        _premove_piece = self.premove.piece
         _premove_square = self.premove.ending_square
         self.remove_premove()
         return self.board_controller.game.find_move(_premove_piece, _premove_square)
@@ -179,6 +191,7 @@ class AIChessInput(ChessInput):
             self.waiting_for_move = False
         else:
             pass
+
 
 class NetworkChessInput(ChessInput):
     pass

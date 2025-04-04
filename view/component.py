@@ -5,7 +5,7 @@ from game.custom_events import EventObserver
 class Component(Drawable, EventObserver):
     def __init__(self, x1, y1, img_lib, img):
         Drawable.__init__(self, x1, y1, img_lib, img)
-    
+
     def update(self):
         pass
 

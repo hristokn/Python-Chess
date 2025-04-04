@@ -1,10 +1,12 @@
 from enum import Enum
 
+
 class ExtendedEnum(Enum):
 
     @classmethod
     def list(cls):
         return [e for e in cls]
+
 
 class PieceType(ExtendedEnum):
     PAWN = 0
@@ -17,19 +19,20 @@ class PieceType(ExtendedEnum):
     def __str__(self) -> str:
         match self:
             case PieceType.PAWN:
-                return ''
+                return ""
             case PieceType.KNIGHT:
-                return 'N'
+                return "N"
             case PieceType.BISHOP:
-                return 'B'
+                return "B"
             case PieceType.ROOK:
-                return 'R'
+                return "R"
             case PieceType.KING:
-                return 'K'
+                return "K"
             case PieceType.QUEEN:
-                return 'Q'
+                return "Q"
             case _:
                 raise NotImplementedError
+
 
 class Color(ExtendedEnum):
     WHITE = 0
@@ -40,7 +43,7 @@ class Color(ExtendedEnum):
             return Color.BLACK
         elif self == Color.BLACK:
             return Color.WHITE
-        
+
     def previous(self):
         if self == Color.WHITE:
             return Color.BLACK

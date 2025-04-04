@@ -7,8 +7,10 @@ from screen.game_end_popup import GameEndPopup
 
 class ChessScreen(BaseChessScreen):
     def __init__(self, mouse, image_library, event_announcer, sound_player, color):
-        board_controller = BoardController(image_library, color, 80, 80, 'ai')
-        super().__init__(mouse, image_library, event_announcer, sound_player, color, board_controller)
+        board_controller = BoardController(image_library, color, 80, 80, "ai")
+        super().__init__(
+            mouse, image_library, event_announcer, sound_player, color, board_controller
+        )
 
         timer_x = 600
         timer_upper_y = 80
@@ -21,11 +23,15 @@ class ChessScreen(BaseChessScreen):
             timer_white_y = timer_upper_y
             timer_black_y = timer_lower_y
 
-        self.black_timer = TimerBox(timer_x, timer_black_y, 1, self.image_library, '', 999, Color.BLACK)
+        self.black_timer = TimerBox(
+            timer_x, timer_black_y, 1, self.image_library, "", 999, Color.BLACK
+        )
         self.add_element(self.black_timer)
         self.event_announcer.register_observer(self.black_timer)
 
-        self.white_timer = TimerBox(timer_x, timer_white_y, 1, self.image_library, '', 999, Color.WHITE)
+        self.white_timer = TimerBox(
+            timer_x, timer_white_y, 1, self.image_library, "", 999, Color.WHITE
+        )
         self.add_element(self.white_timer)
         self.event_announcer.register_observer(self.white_timer)
 
@@ -39,6 +45,15 @@ class ChessScreen(BaseChessScreen):
         self.white_timer.move(black_x, black_y)
 
     def create_game_end_popup(self):
-        self.game_end_popup = GameEndPopup(self.mouse, self.image_library, self.event_announcer, self.sound_player,
-                                           300, 300, self.board_controller.player_color, self.board_controller.finished_game, 'chess_game')
+        self.game_end_popup = GameEndPopup(
+            self.mouse,
+            self.image_library,
+            self.event_announcer,
+            self.sound_player,
+            300,
+            300,
+            self.board_controller.player_color,
+            self.board_controller.finished_game,
+            "chess_game",
+        )
         self.add_element(self.game_end_popup)

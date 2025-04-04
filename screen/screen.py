@@ -12,17 +12,25 @@ from game.sound_player import SoundPlayer
 # class Leaf:
 #     doesn't hold observers,
 
+
 class Screen(Component):
-    def __init__(self, mouse: Mouse, image_library: ImageLibrary, event_announcer: EventAnnouncer,
-                 sound_player: SoundPlayer,
-                 x1, y1, img):
+    def __init__(
+        self,
+        mouse: Mouse,
+        image_library: ImageLibrary,
+        event_announcer: EventAnnouncer,
+        sound_player: SoundPlayer,
+        x1,
+        y1,
+        img,
+    ):
         super().__init__(x1, y1, image_library, img)
-        self.image_library = image_library 
-        self.sound_player = sound_player 
+        self.image_library = image_library
+        self.sound_player = sound_player
         self.mouse = mouse
         self.event_announcer = event_announcer
         self.elements: list[Component] = []
-        self.priority = 0     
+        self.priority = 0
 
     def add_element(self, element):
         self.elements.append(element)

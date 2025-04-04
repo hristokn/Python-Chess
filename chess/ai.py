@@ -17,7 +17,6 @@ piece_values = {
 }
 
 
-
 class AIMove(Thread):
     def __init__(self, chess_board, color):
         Thread.__init__(self)
@@ -25,6 +24,7 @@ class AIMove(Thread):
         self.chess_board = chess_board
         self.move = None
         self.color = color
+
     def run(self):
         self.move = self.runnable(self.chess_board, self.color)
 
@@ -37,12 +37,11 @@ def pick_move(chess_board: ChessBoard, color: Color):
     boardstate.killer_move = None
     boardstate.killer_move_depth = None
     index = len(boardstate.past_moves)
-    value = alphabeta_rec(boardstate, 3, _min,  _max, maximising, index)
+    value = alphabeta_rec(boardstate, 3, _min, _max, maximising, index)
     # else:
     #     value = alphabeta_rec(boardstate, 10, -1,  +1, maximising, index)
 
     return value.move
-
 
 
 class Boardstate:
@@ -60,11 +59,14 @@ class Boardstate:
         self.past_moves.append(move)
         self.color_to_play = self.color_to_play.next()
         self.moves = self.calc_possible_moves()
-        self.moves.sort(key = lambda move: sum([piece_values[taken.type] for taken in move.taken]),reverse=True)
-        
+        self.moves.sort(
+            key=lambda move: sum([piece_values[taken.type] for taken in move.taken]),
+            reverse=True,
+        )
+
     def get_possible_moves(self):
         return self.moves
-    
+
     def calc_possible_moves(self, color: Color = ...):
         moves = []
         if color == ...:
@@ -73,7 +75,7 @@ class Boardstate:
             if piece != None and piece.color == color:
                 moves.extend(piece.get_moves(sq, self.past_moves, self.board))
         return moves
-    
+
     def undo_last_move(self):
         if len(self.past_moves) == 0:
             return
@@ -85,40 +87,67 @@ class Boardstate:
             for changes in reversed(board_states):
                 if changed_sq in changes:
                     self.board[changed_sq] = changes[changed_sq]
-                    break        
-        
-        self.color_to_play = self.color_to_play.previous()
+                    break
 
+        self.color_to_play = self.color_to_play.previous()
 
     def value_board(self):
         MOVE_VALUE = 0.02
         CHECK_VALUE = 0.50
         TAKE_VALUE = 0.10
-        white_piece_value = sum([piece_values[piece.type] for piece in self.board.values() if piece != None and piece.color == Color.WHITE])
-        black_piece_value = sum([piece_values[piece.type] for piece in self.board.values() if piece != None and piece.color == Color.BLACK])
-        
+        white_piece_value = sum(
+            [
+                piece_values[piece.type]
+                for piece in self.board.values()
+                if piece != None and piece.color == Color.WHITE
+            ]
+        )
+        black_piece_value = sum(
+            [
+                piece_values[piece.type]
+                for piece in self.board.values()
+                if piece != None and piece.color == Color.BLACK
+            ]
+        )
+
         white_move_value = 0
         white_take_value = 0
         black_move_value = 0
         black_take_value = 0
         if self.color_to_play == Color.WHITE:
-            moves = self.get_possible_moves() 
-            white_move_value = len(moves)*MOVE_VALUE
-            white_take_value = len([move for move in moves if len(move.taken) != 0])*TAKE_VALUE
+            moves = self.get_possible_moves()
+            white_move_value = len(moves) * MOVE_VALUE
+            white_take_value = (
+                len([move for move in moves if len(move.taken) != 0]) * TAKE_VALUE
+            )
 
-            moves = self.calc_possible_moves(Color.BLACK) 
-            black_move_value = len(moves)*MOVE_VALUE
-            black_take_value = len([move for move in moves if len(move.taken) != 0])*TAKE_VALUE
+            moves = self.calc_possible_moves(Color.BLACK)
+            black_move_value = len(moves) * MOVE_VALUE
+            black_take_value = (
+                len([move for move in moves if len(move.taken) != 0]) * TAKE_VALUE
+            )
         else:
-            moves = self.calc_possible_moves(Color.WHITE) 
-            white_move_value = len(moves)*MOVE_VALUE
-            white_take_value = len([move for move in moves if len(move.taken) != 0])*TAKE_VALUE
-            
-            moves = self.get_possible_moves() 
-            black_move_value = len(moves)*MOVE_VALUE
-            black_take_value = len([move for move in moves if len(move.taken) != 0])*TAKE_VALUE
+            moves = self.calc_possible_moves(Color.WHITE)
+            white_move_value = len(moves) * MOVE_VALUE
+            white_take_value = (
+                len([move for move in moves if len(move.taken) != 0]) * TAKE_VALUE
+            )
 
-        return white_piece_value + white_move_value + white_take_value - black_piece_value - black_move_value - black_take_value
+            moves = self.get_possible_moves()
+            black_move_value = len(moves) * MOVE_VALUE
+            black_take_value = (
+                len([move for move in moves if len(move.taken) != 0]) * TAKE_VALUE
+            )
+
+        return (
+            white_piece_value
+            + white_move_value
+            + white_take_value
+            - black_piece_value
+            - black_move_value
+            - black_take_value
+        )
+
 
 class ValueMove:
     def __init__(self, value, move):
@@ -128,20 +157,28 @@ class ValueMove:
     def min(self, other):
         if other.value < self.value:
             return other
-        else: 
+        else:
             return self
-        
+
     def max(self, other):
         if other.value > self.value:
             return other
-        else: 
+        else:
             return self
-_min = ValueMove(float('-inf'), None)
-_max = ValueMove(float('inf'),None)
-        
 
 
-def alphabeta_rec(boardstate: Boardstate, depth:int, alpha:ValueMove, beta:ValueMove, maximizingPlayer:bool, index):
+_min = ValueMove(float("-inf"), None)
+_max = ValueMove(float("inf"), None)
+
+
+def alphabeta_rec(
+    boardstate: Boardstate,
+    depth: int,
+    alpha: ValueMove,
+    beta: ValueMove,
+    maximizingPlayer: bool,
+    index,
+):
     moves = boardstate.get_possible_moves()
     if depth == 0 or len(moves) == 0:
         return ValueMove(boardstate.value_board(), boardstate.past_moves[index])
@@ -155,13 +192,15 @@ def alphabeta_rec(boardstate: Boardstate, depth:int, alpha:ValueMove, beta:Value
             moves[killer_move_index] = first_move
         for move in moves:
             child.play_move(move)
-            value = value.max(alphabeta_rec(child, depth - 1, alpha, beta, False, index))
+            value = value.max(
+                alphabeta_rec(child, depth - 1, alpha, beta, False, index)
+            )
             alpha = alpha.max(value)
             if value.value >= beta.value:
                 boardstate.killer_move = move
                 boardstate.killer_move_depth = depth
                 child.undo_last_move()
-                break 
+                break
             child.undo_last_move()
         return value
     else:
@@ -173,6 +212,6 @@ def alphabeta_rec(boardstate: Boardstate, depth:int, alpha:ValueMove, beta:Value
             beta = beta.min(value)
             if value.value <= alpha.value:
                 child.undo_last_move()
-                break 
+                break
             child.undo_last_move()
         return value

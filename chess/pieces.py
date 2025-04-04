@@ -1,7 +1,16 @@
 from typing import Callable
 from chess.squares import Square, Orientation, WhiteOrientation, BlackOrientation
-from chess.move_logic import Move, pawn_move_logic, knight_move_logic, bishop_move_logic, rook_move_logic, king_move_logic, queen_move_logic
+from chess.move_logic import (
+    Move,
+    pawn_move_logic,
+    knight_move_logic,
+    bishop_move_logic,
+    rook_move_logic,
+    king_move_logic,
+    queen_move_logic,
+)
 from chess.enums import Color, PieceType
+
 
 class Piece:
     def __init__(self, color: Color, piece_type: PieceType):
@@ -11,9 +20,10 @@ class Piece:
 
     def get_moves(self, square, prev_moves, chess_board):
         return get_logic(self.type)(square, chess_board, prev_moves, self.orientation)
-    
+
     def __str__(self) -> str:
         return str(self.type)
+
 
 def get_orientation(color: Color):
     match color:
@@ -25,7 +35,9 @@ def get_orientation(color: Color):
             raise NotImplementedError
 
 
-def get_logic(piece_type: PieceType) -> Callable[[Square, dict[Square: Piece], Orientation], Move]: 
+def get_logic(
+    piece_type: PieceType,
+) -> Callable[[Square, dict[Square:Piece], Orientation], Move]:
     match piece_type:
         case PieceType.PAWN:
             return pawn_move_logic
