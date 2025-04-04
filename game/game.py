@@ -69,6 +69,9 @@ class Game:
 
     def remove_object(self, obj):
         self.objects.remove(obj)
+        self.event_announcer.unregister_observer(obj)
+        self.mouse.unregister_button_observer(obj)
+        self.mouse.unregister_motion_observer(obj)
 
     def handle_click(self, click: pygame.event.Event):
         self.mouse.process_mouse_event(click)
