@@ -35,8 +35,8 @@
 
 ## Goals
 Some features I would like to add:
-- Add sounds to the game
 - Starting a game with a user defined position
+- Work on the AI opponent, currently is has issues
 
 ## Special thanks
 - itch.io user [bz-game](https://bz-game.itch.io/) for the sprites of the chess board and pieces 
