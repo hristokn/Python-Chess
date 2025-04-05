@@ -1,3 +1,4 @@
+from chess import pieces
 from view.view import View
 from pygame import Surface
 from pygame.event import Event
@@ -17,7 +18,7 @@ class TakenPiecesDisplay(View):
 
     def draw(self, surface: Surface):
         offset = 0
-        for type, count in self._display:
+        for type, count in self._display.items():
             for i in range(count):
                 offset += self._margin
                 surface.blit(
@@ -35,7 +36,7 @@ class TakenPiecesDisplay(View):
         return False
 
     def update_display(self):
-        display = {}
+        display: dict[PieceType, int] = {}
         for piece in self._game.taken_pieces:
             if piece.color == self._color:
                 try:
@@ -43,7 +44,7 @@ class TakenPiecesDisplay(View):
                 except KeyError:
                     display[piece.type] = 1
 
-        self._display = sorted(display.items(), key=lambda i: i[0].value)
+        self._display = dict(sorted(display.items(), key=lambda i: i[0].value))
 
     def receive_event(self, event):
         if (

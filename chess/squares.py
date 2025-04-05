@@ -1,5 +1,5 @@
 from enum import Enum
-from abc import ABC
+from abc import ABC, abstractmethod
 from chess.enums import Color
 
 
@@ -136,39 +136,47 @@ class Square(Enum):
 
 class Orientation(ABC):
     @staticmethod
-    def up(square: Square):
-        return NotImplementedError
+    @abstractmethod
+    def up(square: Square) -> Square:
+        pass
 
     @staticmethod
-    def down(square: Square):
-        return NotImplementedError
+    @abstractmethod
+    def down(square: Square) -> Square:
+        pass
 
     @staticmethod
-    def left(square: Square):
-        return NotImplementedError
+    @abstractmethod
+    def left(square: Square) -> Square:
+        pass
 
     @staticmethod
-    def right(square: Square):
-        return NotImplementedError
+    @abstractmethod
+    def right(square: Square) -> Square:
+        pass
 
     @staticmethod
-    def upleft(square: Square):
-        return NotImplementedError
+    @abstractmethod
+    def upleft(square: Square) -> Square:
+        pass
 
     @staticmethod
-    def upright(square: Square):
-        return NotImplementedError
+    @abstractmethod
+    def upright(square: Square) -> Square:
+        pass
 
     @staticmethod
-    def downleft(square: Square):
-        return NotImplementedError
+    @abstractmethod
+    def downleft(square: Square) -> Square:
+        pass
 
     @staticmethod
-    def downright(square: Square):
-        return NotImplementedError
+    @abstractmethod
+    def downright(square: Square) -> Square:
+        pass
 
     @staticmethod
-    def _upleft(square: Square, orientation):
+    def _upleft(square: Square, orientation) -> Square:
         return orientation.left(orientation.up(square))
 
     @staticmethod

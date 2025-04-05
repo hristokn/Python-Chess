@@ -1,8 +1,6 @@
-from chess.chess import ChessBoard, Piece
+from chess.chess import ChessBoard, ChessBoardDict
 from chess.enums import Color, PieceType
-from chess.squares import Square
 from chess.moves import Move
-from random import randint
 from threading import Thread
 from copy import deepcopy
 
@@ -47,8 +45,8 @@ def pick_move(chess_board: ChessBoard, color: Color):
 class Boardstate:
     def __init__(self, chessboard: ChessBoard):
         cb = deepcopy(chessboard)
-        self.board: dict[Square, Piece] = cb.board
-        self.board_starting_state: dict[Square, Piece] = cb.board_starting_state
+        self.board: ChessBoardDict = cb.board
+        self.board_starting_state: ChessBoardDict = cb.board_starting_state
         self.past_moves: list[Move] = cb.past_moves
         self.color_to_play: Color = cb.color_to_play
         self.moves = self.calc_possible_moves()

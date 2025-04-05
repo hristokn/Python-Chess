@@ -38,14 +38,16 @@ class Color(ExtendedEnum):
     WHITE = 0
     BLACK = 1
 
-    def next(self):
+    def next(self) -> "Color":
         if self == Color.WHITE:
             return Color.BLACK
         elif self == Color.BLACK:
             return Color.WHITE
+        raise NotImplementedError()
 
-    def previous(self):
+    def previous(self) -> "Color":
         if self == Color.WHITE:
             return Color.BLACK
         elif self == Color.BLACK:
             return Color.WHITE
+        raise NotImplementedError()

@@ -25,7 +25,7 @@ class TimerBox(View):
         self._timer.update()
         if (
             self._timer.remaining() <= self._timer.LOW_TIME_THRESHOLD_NS
-            and not self.low_time_waring_played
+            and not self.low_time_warning_played
         ):
             self.low_time_warning_played = True
             post_event(CustomEvent.LOW_TIME, color=self._color)

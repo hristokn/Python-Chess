@@ -1,12 +1,14 @@
-from chess.pieces import Piece
 from chess.enums import Color, PieceType
 from chess.squares import Square, WhiteOrientation
+from chess.pieces import Piece
 from chess.moves import Move
 from collections.abc import Callable
 from enum import Enum
 
+type ChessBoardDict = dict[Square, Piece | None]
 
-def standard_board(board: dict[Square, None | Piece]):
+
+def standard_board(board: ChessBoardDict):
     sq = Square.A2
     for _ in range(8):
         board[sq] = Piece(Color.WHITE, PieceType.PAWN)
@@ -40,9 +42,9 @@ class ChessBoard:
     def __init__(
         self,
         first_color: Color,
-        board_setup: Callable[[dict[Square, None | Piece]], None] = standard_board,
+        board_setup: Callable[[ChessBoardDict], None] = standard_board,
     ):
-        self.board = {Square(square): None for square in range(64)}
+        self.board: ChessBoardDict = {Square(square): None for square in range(64)}
         board_setup(self.board)
         self.board_starting_state = self.board.copy()
         self.past_moves: list[Move] = []
@@ -93,7 +95,7 @@ class ChessBoard:
             possible_moves = [
                 move
                 for move in possible_moves
-                if not (hasattr(move, "is_castle") and move.is_castle)
+                if not (getattr(move, "is_castle", False))
             ]
         return possible_moves
 
@@ -180,9 +182,9 @@ class ChessBoard:
         self.play_move(move)
         self.prepare_turn()
 
-    def undo_last_move(self):
+    def undo_last_move(self) -> bool:
         if len(self.past_moves) == 0:
-            return
+            return False
         last_move = self.past_moves.pop()
         for taken in last_move.taken:
             self.taken_pieces.remove(taken)
@@ -197,6 +199,7 @@ class ChessBoard:
 
         self.color_to_play = self.color_to_play.previous()
         self.update_possible_moves(self.color_to_play)
+        return True
 
 
 class FinishedGameType(Enum):

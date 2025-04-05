@@ -20,7 +20,7 @@ MOVE_SOUND_COUNT = 3
 
 
 class ChessBoardSoundPlayer(Component):
-    def __init__(self, sound_player: SoundPlayer, player_color: Color = None):
+    def __init__(self, sound_player: SoundPlayer, player_color: Color | None = None):
         super().__init__(0, 0, 0, "")
         self.priority = 0
         self.sound_player = sound_player

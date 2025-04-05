@@ -1,7 +1,6 @@
 from chess.moves import Move
 from chess.enums import Color
 from chess.ai import AIMove
-from view.chess_controller import PieceController, SquareController
 from abc import ABC, abstractmethod
 
 
@@ -26,7 +25,7 @@ class Premove:
 
 
 class MouseChessInput(ChessInput):
-    def __init__(self, board_controller, colors: Color) -> None:
+    def __init__(self, board_controller, colors: list[Color]) -> None:
         super().__init__(board_controller)
         self.move = None
         self.premove = None
@@ -151,11 +150,16 @@ class MouseChessInput(ChessInput):
         self.board_controller.highlight_square(self.premove.ending_square)
 
     def remove_premove(self):
-        self.board_controller.unhighlight_square(self.premove.starting_square)
-        self.board_controller.unhighlight_square(self.premove.ending_square)
-        self.premove = None
+        if self.premove != None:
+            self.board_controller.unhighlight_square(self.premove.starting_square)
+            self.board_controller.unhighlight_square(self.premove.ending_square)
+            self.premove = None
 
     def use_premove(self) -> Move:
+        if self.premove == None:
+            raise ValueError(
+                "Premove is None, cannot use a premove that does not exist."
+            )
         _premove_piece = self.premove.piece
         _premove_square = self.premove.ending_square
         self.remove_premove()
@@ -185,7 +189,7 @@ class AIChessInput(ChessInput):
             return None
 
     def update(self):
-        if self.waiting_for_move and not self.thread.is_alive():
+        if self.waiting_for_move and self.thread != None and not self.thread.is_alive():
             self.move = self.thread.move
             self.thread = None
             self.waiting_for_move = False

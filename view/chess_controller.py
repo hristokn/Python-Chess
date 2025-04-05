@@ -35,6 +35,7 @@ class SquareController(View):
         x, y = event.pos
         if self.collides(x, y):
             return True
+        return False
 
     def recieve_mouse_motion(self, event: Event):
         pass
@@ -58,6 +59,7 @@ class PieceController(View):
         x, y = event.pos
         if self.collides(x, y):
             return True
+        return False
 
     def recieve_mouse_motion(self, event: Event):
         if self.hidden:

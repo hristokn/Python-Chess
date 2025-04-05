@@ -10,11 +10,9 @@ class VictoryType(Enum):
 
 
 class FinishedGame:
-    board: ChessBoard
-    winner: Color | None
-    victory_type: VictoryType
-
-    def __init__(self, board: ChessBoard, winner: Color, victory_type: VictoryType):
+    def __init__(
+        self, board: ChessBoard, winner: Color | None, victory_type: VictoryType
+    ):
         self.board = board
         self.winner = winner
         self.victory_type = victory_type

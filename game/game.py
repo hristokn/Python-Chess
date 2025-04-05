@@ -23,7 +23,7 @@ class Game:
         self.mouse = Mouse()
         self.image_library = ImageLibrary(self._get_images())
         self.sound_player = SoundPlayer(self._get_sounds())
-        self.screen: Screen = None
+        self.screen: Screen | None = None
         self.event_announcer = EventAnnouncer()
         self.event_announcer.register_observer(self.mouse)
 
@@ -74,9 +74,6 @@ class Game:
         self.mouse.unregister_button_observer(obj)
         self.mouse.unregister_motion_observer(obj)
 
-    def handle_click(self, click: pygame.event.Event):
-        self.mouse.process_mouse_event(click)
-
     def open_screen(self, event: pygame.event.Event):
         screen_name = event.screen_name
         new_screen = None
@@ -104,6 +101,10 @@ class Game:
                     self.sound_player,
                     event.color,
                 )
+            case _:
+                raise ValueError(
+                    "Change Screen event has an unknown screen name attribute"
+                )
 
         if self.screen != None:
             self.screen.destroy()
@@ -111,6 +112,12 @@ class Game:
         self.screen = new_screen
         self.event_announcer.register_observer(new_screen)
         self.add_object(new_screen)
+
+    def _get_images(self) -> dict[str, str]:
+        return {}
+
+    def _get_sounds(self) -> dict[str, str]:
+        return {}
 
 
 class ChessGame(Game):
@@ -124,8 +131,8 @@ class ChessGame(Game):
         post_event(CustomEvent.CHANGE_SCREEN, screen_name="main_menu")
         super().run()
 
-    def _get_images(self):
+    def _get_images(self) -> dict[str, str]:
         return IMAGES
 
-    def _get_sounds(self):
+    def _get_sounds(self) -> dict[str, str]:
         return SOUNDS

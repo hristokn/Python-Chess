@@ -19,12 +19,12 @@ class Text(View):
             self.font_img, (self.text_x + self.draw_x1, self.text_y + self.draw_y1)
         )
 
-    def prepare_text(self):
-        width = self.x2 - self.x1
-        height = self.y2 - self.y1
-        self.prepare_text(width, height)
+    def prepare_text(self, width=..., height=...):
+        if width == ...:
+            width = self.x2 - self.x1
+        if height == ...:
+            height = self.x2 - self.x1
 
-    def prepare_text(self, width, height):
         self.text_width, self.text_height = self.font.size(self.text)
         self.button_width = width
         self.button_height = height

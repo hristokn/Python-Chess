@@ -18,14 +18,19 @@ class Piece:
         self.type = piece_type
         self.orientation = get_orientation(color)
 
-    def get_moves(self, square, prev_moves, chess_board):
+    def get_moves(
+        self,
+        square: Square,
+        prev_moves: list[Move],
+        chess_board: dict[Square, "Piece | None"],
+    ) -> list[Move]:
         return get_logic(self.type)(square, chess_board, prev_moves, self.orientation)
 
     def __str__(self) -> str:
         return str(self.type)
 
 
-def get_orientation(color: Color):
+def get_orientation(color: Color) -> type[WhiteOrientation] | type[BlackOrientation]:
     match color:
         case Color.WHITE:
             return WhiteOrientation
@@ -37,7 +42,9 @@ def get_orientation(color: Color):
 
 def get_logic(
     piece_type: PieceType,
-) -> Callable[[Square, dict[Square:Piece], Orientation], Move]:
+) -> Callable[
+    [Square, dict[Square, Piece | None], list[Move], type[Orientation]], list[Move]
+]:
     match piece_type:
         case PieceType.PAWN:
             return pawn_move_logic

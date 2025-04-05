@@ -1,3 +1,4 @@
+from game.board_controller import BoardController
 from screen.screen import Screen
 from game.drawing import ImageLibrary
 from game.mouse import Mouse
@@ -19,7 +20,7 @@ class BaseChessScreen(Screen, ABC):
         event_announcer: EventAnnouncer,
         sound_player: SoundPlayer,
         color: Color,
-        board_controller,
+        board_controller: BoardController,
     ):
         super().__init__(mouse, image_library, event_announcer, sound_player, 0, 0, "")
         self.board_controller = board_controller

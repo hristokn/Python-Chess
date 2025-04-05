@@ -8,7 +8,7 @@ class Piece:
 class Move:
     def __init__(
         self,
-        changes: dict[Square:Piece],
+        changes: dict[Square, Piece],
         taken: list[Piece],
         piece: Piece,
         end_square: Square,

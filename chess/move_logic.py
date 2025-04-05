@@ -13,8 +13,10 @@ class Piece:
 
 
 def line_attack(
-    square: Square, board: dict[Square:Piece], direction: Callable[[Square], Square]
-):
+    square: Square,
+    board: dict[Square, Piece | None],
+    direction: Callable[[Square], Square],
+) -> list[Move]:
     moves = []
     piece = board[square]
     sq = direction(square)
@@ -32,8 +34,10 @@ def line_attack(
 
 
 def one_step_only_take(
-    square: Square, board: dict[Square:Piece], direction: Callable[[Square], Square]
-):
+    square: Square,
+    board: dict[Square, Piece | None],
+    direction: Callable[[Square], Square],
+) -> list[Move]:
     moves = []
     piece = board[square]
     sq = direction(square)
@@ -44,8 +48,10 @@ def one_step_only_take(
 
 
 def one_step_only_move(
-    square: Square, board: dict[Square:Piece], direction: Callable[[Square], Square]
-):
+    square: Square,
+    board: dict[Square, Piece | None],
+    direction: Callable[[Square], Square],
+) -> list[Move]:
     moves = []
     piece = board[square]
     sq = direction(square)
@@ -56,15 +62,17 @@ def one_step_only_move(
 
 
 def one_step_attack(
-    square: Square, board: dict[Square:Piece], direction: Callable[[Square], Square]
-):
+    square: Square,
+    board: dict[Square, Piece | None],
+    direction: Callable[[Square], Square],
+) -> list[Move]:
     moves = []
     moves.extend(one_step_only_move(square, board, direction))
     moves.extend(one_step_only_take(square, board, direction))
     return moves
 
 
-def has_moved_before(piece: Piece, prev_moves: list[Move]):
+def has_moved_before(piece: Piece, prev_moves: list[Move]) -> bool:
     for move in prev_moves:
         if piece in move.changes.values():
             return True
@@ -72,7 +80,7 @@ def has_moved_before(piece: Piece, prev_moves: list[Move]):
     return False
 
 
-def last_move_is_long_pawn_move(prev_moves: list[Move]):
+def last_move_is_long_pawn_move(prev_moves: list[Move]) -> bool:
     move_count = len(prev_moves)
     if move_count == 0:
         return False
@@ -91,15 +99,14 @@ def last_move_is_long_pawn_move(prev_moves: list[Move]):
     return False
 
 
-def can_promote(move: Move, direction):
-    if (
+def can_promote(move: Move, direction) -> bool:
+    return (
         move.get_end_square() != Square.UNKNOWN
         and direction(move.get_end_square()) == Square.UNKNOWN
-    ):
-        return True
+    )
 
 
-def promote(move: Move):
+def promote(move: Move) -> list[Move]:
     moves = []
 
     types_to_promote = [
@@ -121,10 +128,10 @@ def promote(move: Move):
 
 def castle(
     square: Square,
-    board: dict[Square:Piece],
+    board: dict[Square, Piece | None],
     prev_moves: list[Move],
     direction: Callable[[Square], Square],
-):
+) -> list[Move]:
     moves = []
     king = board[square]
     if has_moved_before(king, prev_moves):
@@ -164,10 +171,10 @@ def castle(
 
 def pawn_move_logic(
     square: Square,
-    board: dict[Square:Piece],
+    board: dict[Square, Piece | None],
     prev_moves: list[Move],
-    orientaion: Orientation,
-):
+    orientaion: type[Orientation],
+) -> list[Move]:
     moves = []
     pawn = board[square]
 
@@ -206,10 +213,10 @@ def pawn_move_logic(
 
 def rook_move_logic(
     square: Square,
-    board: dict[Square:Piece],
+    board: dict[Square, Piece | None],
     prev_moves: list[Move],
-    orientaion: Orientation,
-):
+    orientaion: type[Orientation],
+) -> list[Move]:
     moves = []
     moves.extend(line_attack(square, board, orientaion.up))
     moves.extend(line_attack(square, board, orientaion.down))
@@ -221,10 +228,10 @@ def rook_move_logic(
 
 def bishop_move_logic(
     square: Square,
-    board: dict[Square:Piece],
+    board: dict[Square, Piece | None],
     prev_moves: list[Move],
-    orientaion: Orientation,
-):
+    orientaion: type[Orientation],
+) -> list[Move]:
     moves = []
     moves.extend(line_attack(square, board, orientaion.upleft))
     moves.extend(line_attack(square, board, orientaion.upright))
@@ -236,10 +243,10 @@ def bishop_move_logic(
 
 def king_move_logic(
     square: Square,
-    board: dict[Square:Piece],
+    board: dict[Square, Piece | None],
     prev_moves: list[Move],
-    orientaion: Orientation,
-):
+    orientaion: type[Orientation],
+) -> list[Move]:
     moves = []
 
     moves.extend(one_step_attack(square, board, orientaion.up))
@@ -259,10 +266,10 @@ def king_move_logic(
 
 def knight_move_logic(
     square: Square,
-    board: dict[Square:Piece],
+    board: dict[Square, Piece | None],
     prev_moves: list[Move],
-    orientaion: Orientation,
-):
+    orientaion: type[Orientation],
+) -> list[Move]:
     moves = []
 
     knight_move_uur = lambda sq: orientaion.up(orientaion.up(orientaion.right(sq)))
@@ -288,10 +295,10 @@ def knight_move_logic(
 
 def queen_move_logic(
     square: Square,
-    board: dict[Square:Piece],
+    board: dict[Square, Piece | None],
     prev_moves: list[Move],
-    orientaion: Orientation,
-):
+    orientaion: type[Orientation],
+) -> list[Move]:
     moves = []
 
     moves.extend(line_attack(square, board, orientaion.up))

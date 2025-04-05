@@ -27,11 +27,11 @@ CUSTOM_EVENTS_ATTRIBUTES = {
 }
 
 
-def post_event(event: CustomEvent, **kwargs):
-    for attribute in CUSTOM_EVENTS_ATTRIBUTES[event]:
+def post_event(event_type: CustomEvent, **kwargs):
+    for attribute in CUSTOM_EVENTS_ATTRIBUTES[event_type]:
         if attribute not in kwargs.keys():
             raise ValueError()
-    event = Event(event.value)
+    event = Event(event_type.value)
     for keyword, arg in kwargs.items():
         if not hasattr(event, keyword):
             setattr(event, keyword, arg)
